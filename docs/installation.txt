@@ -1,0 +1,9 @@
+Installation and Configuration
+==============================
+
+The easyiest way to install Checker is::
+
+  easy_install checker
+
+Or, if you're using `zc.buildout`, just specify ``checker`` as a
+required egg. 

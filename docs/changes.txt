@@ -1,0 +1,7 @@
+Changes
+=======
+
+1.0 (x Dec 2009)
+------------------
+
+- Initial Release
