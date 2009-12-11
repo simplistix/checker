@@ -1,5 +1,5 @@
-Installation and Configuration
-==============================
+Installation
+============
 
 The easyiest way to install Checker is::
 

@@ -1,0 +1,23 @@
+==================
+Available Checkers
+==================
+
+
+.. module:: checker
+
+path
+----
+
+svn
+---
+
+buildout
+--------
+
+crontab
+-------
+
+dpkg
+----
+
+

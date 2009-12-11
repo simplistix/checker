@@ -1,6 +1,0 @@
-=============
-Using Checker
-=============
-
-.. module:: checker
-

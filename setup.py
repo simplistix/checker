@@ -23,4 +23,7 @@ setup(
     ],    
     packages=[package_name],
     zip_safe=False,
+    extras_require=dict(
+        test=['mock','manuel'],
+        )
     )

@@ -1,12 +1,11 @@
-ErrorHandler documentation
+Checker documentation
 ==========================
 
 .. toctree::
    :maxdepth: 2
 
    installation.txt
-   use.txt
-   api.txt
+   checkers.txt
    development.txt
    changes.txt
    license.txt
