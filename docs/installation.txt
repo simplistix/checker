@@ -5,5 +5,35 @@ The easyiest way to install Checker is::
 
   easy_install checker
 
-Or, if you're using `zc.buildout`, just specify ``checker`` as a
-required egg. 
+This will give you an executable ``checker`` script in the same
+location as your other python global scripts.
+
+Or, if you're using `zc.buildout`, use the `zc.recipe.egg`__ recipe to
+get a checker script as follows:
+
+__ http://pypi.python.org/pypi/zc.recipe.egg
+
+.. topic:: buildout.cfg
+ :class: file
+
+ ::
+
+   [buildout]
+   parts = checker
+
+   [checker]
+   recipe = zc.recipe.egg    
+   eggs = checker
+
+ .. -> buildout_cfg
+
+.. check the above actually works:
+
+  >>> write(sample_buildout,'buildout.cfg',buildout_cfg)
+  >>> print system(buildout)
+  Installing checker.
+  Generated script '/sample-buildout/bin/checker'.
+  <BLANKLINE>
+
+This will give you an executable ``checker`` script in the ``bin``
+directory of your buildout.

@@ -23,7 +23,12 @@ setup(
     ],    
     packages=[package_name],
     zip_safe=False,
+    entry_points=dict(
+        console_scripts = [
+            'checker = checker:main',
+            ]
+        ),
     extras_require=dict(
-        test=['mock','manuel'],
+        test=['mock','manuel','zc.buildout','zc.recipe.egg'],
         )
     )
