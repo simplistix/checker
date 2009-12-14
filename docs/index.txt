@@ -5,6 +5,7 @@ Checker documentation
    :maxdepth: 2
 
    installation.txt
+   use.txt
    checkers.txt
    development.txt
    changes.txt

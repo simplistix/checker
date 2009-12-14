@@ -8,16 +8,145 @@ Available Checkers
 path
 ----
 
+This checker will copy the file or folder in the path specified into
+the configuration folder. It will also create a listing file next to
+the copied path containing a recursive listing of the copied file or
+folder containing as much ownership and permission information is
+available from the operating system on which Checker is running.
+
+For example, the following configuration lines::
+
+  path:/some/folder
+  path:/another/file.cfg
+
+results in the following files and folders being present in the
+configuration folder:: 
+
+  /config/another/file.cfg
+  /config/another/file.cfg.listing
+  /config/checker.txt
+  /config/some/folder
+  /config/some/folder/afile.cfg
+  /config/some/folder/bfile.cfg
+  /config/some/folder.listing
+
+The listing files will contain information in the following style on
+unix systems::
+
+  /some/folder:
+  drwxr-xr-x root root .
+  -rw-r--r-- root root afile.cfg
+  drwxr-xr-x root root bfile.cfg
+  
+On Windows, they will look more like::
+
+   Directory of C:\some\folder
+
+ DOMAIN\User .
+ DOMAIN\user ..
+ DOMAIN\user afile.cfg
+ DOMAIN\user bfile.cfg
+
+This means that the implicit checker run on the configuration folder
+will show up any changes in the contents, ownership or permissions of
+any file or folder specified in a `path` checker.
+
 svn
 ---
+
+This checker with perform an :command:`svn update -q` followed by an
+:command:`svn status` in the path specified.
+The output will be filtered to remove any information that doesn't
+indicate a changed file or folder, such as subversion externals that
+are present in the checkout being examined.
+
+For example, the following configuration line::
+
+  svn:/some/folder
+
+Will result in the following commands being executed::
+
+  svn up -q /some/folder
+  svn status /some/folder
+
+This means if there are any unknown files or files that have been
+changed in the checkout but not committed, they will be included in
+the output from checker.
 
 buildout
 --------
 
+This checker is an extension of the `svn` checker that, once the
+:command:`svn status` has been performed, is followed by a
+:command:`buildout -o -q`.
+
+For example, the following configuration line::
+
+  buildout:/some/folder
+
+Will result in the following commands being executed::
+
+  svn up -q /some/folder
+  svn status /some/folder
+  chdir /some/folder
+  bin/buildout -o -q
+
+This will effectively keep your buildout up to date and make sure
+that if any packages required by your buildout are not present, you
+will be notified.
+
 crontab
 -------
+
+This checker executes a :command:`crontab -l -u` for the user supplied
+in the configuration and stores the output in a file in the
+configuration folder.
+
+For example, the following configuration line::
+
+  crontab:root
+
+Will result in the following files being present in the configuration
+folder::
+
+  /config/checker.txt
+  /config/crontabs/root
+
+The `root` files is likely to contain something like the following::
+
+  # A comment
+  * * * * * /your/cron/job
+  0 0 * * * /your/other/cron job
+
+.. warning:: 
+
+  For the `crontab` checker to work, Checker must be run as
+  the `root` user.
 
 dpkg
 ----
 
+This checker executes a :command:`dpkg -l` and puts the output in file
+called `dpkg` in the configuration folder.
 
+For example, the following configuration line::
+
+  dpkg:
+
+Will result in the following files being present in the configuration
+folder:: 
+
+  /config/checker.txt
+  /config/dpkg
+
+With :file:`/config/dpkg` containing something like::
+
+  Desired=Unknown/Install/Remove/Purge/Hold
+  | Status=Not/Installed/Config-f/Unpacked/Failed-cfg/Half-inst/t-aWait/T-pend
+  |/ Err?=(none)/Hold/Reinst-required/X=both-problems (Status,Err: uppercase=bad)
+  ||/ Name                      Version                   Description
+  +++-=========================-=========================-==================================================================
+  ii  ack-grep                  1.80-1                    A grep-like program specifically for large source trees
+  ii  adduser                   3.105ubuntu1              add and remove users and groups
+  ii  apache2                   2.2.8-1ubuntu0.10         Next generation, scalable, extendable web server
+  

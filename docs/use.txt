@@ -1,0 +1,64 @@
+Using Checker
+=============
+
+Once installed, checker is used by executing the the checker script.
+This will look for a configuration, by default located in
+:file:`/config`. The configuration location can be overriden with a
+command line options to the checker script::
+
+  checker -C /some/folder
+
+Within the configuration folder, Checker looks for a file called
+:file:`checker.txt` that contains a list of rows defining the
+configurations to be checked, for example:
+
+.. topic:: checker.txt
+ :class: file
+
+ ::
+
+   path:/some/folder
+   path:/some/file
+  
+   # blank lines and lines starting with hashes are ignored.
+   crontab:root
+   svn:/some/checkout
+   buildout:/some/buildout
+
+Each one of these lines starts with the name of a checker followed by
+a colon. The remainder of the line is passed through to the checker
+for it to find the configuration information it should be checking.
+The checker may then write information to the configuration directory.
+
+Once all the checkers have been run, an implict checker is run on the
+configuration folder itself. At this time, only subversion is
+supported for this implicit checker.
+
+By default, any changes found by a checker are printed to stdout. This
+makes checker ideal for running as a nightly cron job where the output
+will be emailed to the user running the cron job.
+
+However, on some systems, output from scheduled tasks is not emailed
+to the user running the task. In this case, some special lines may be
+added to :file:`checker.txt` as follows::
+
+  email_to: recipient1@example.com,recipient2@example.com
+  email_from: sender@example.com
+  email_subject: Checker output
+  email_smtphost: localhost
+
+Only `email_to` is required, and once specified, if the other options
+are not present, the following defaults will be used:
+
+`email_from`
+  The `email_to` value will be used if no `email_from` is supplied.
+
+`email_subject`
+  If not specified, the subject will default to the text::
+ 
+    Checker output from 
+   
+  followed by the hostname of the machone on which Checker is run.
+
+`email_smtphost`
+  This defaults to `localhost`.

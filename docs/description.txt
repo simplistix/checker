@@ -2,6 +2,21 @@
 Checker
 =======
 
-This is a pluggable tool for comparing the configuration of a machine
-with a known configuration stored in text files in a source control
-system. 
+This is a cross-platform, pluggable tool for comparing the
+configuration of a machine with a known configuration stored in text
+files in a source control system. 
+
+It currently supports comparison of the following types of
+configuration data:
+
+- text files and directories containing text files
+
+- Subversion checkouts
+
+- Subversion checkouts that are also `buildouts`__
+
+- crontabs
+
+- installed Debian/Ubuntu package versions
+
+__ http://pypi.python.org/pypi/zc.buildout
