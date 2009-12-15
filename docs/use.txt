@@ -8,6 +8,10 @@ command line options to the checker script::
 
   checker -C /some/folder
 
+.. -> command
+
+  >>> print repr(command)
+
 Within the configuration folder, Checker looks for a file called
 :file:`checker.txt` that contains a list of rows defining the
 configurations to be checked, for example:
@@ -24,6 +28,10 @@ configurations to be checked, for example:
    crontab:root
    svn:/some/checkout
    buildout:/some/buildout
+
+.. -> checker_txt
+ 
+  >>> print checker_txt
 
 Each one of these lines starts with the name of a checker followed by
 a colon. The remainder of the line is passed through to the checker
@@ -46,6 +54,10 @@ added to :file:`checker.txt` as follows::
   email_from: sender@example.com
   email_subject: Checker output
   email_smtphost: localhost
+
+.. -> checker_txt
+ 
+  >>> print checker_txt
 
 Only `email_to` is required, and once specified, if the other options
 are not present, the following defaults will be used:
