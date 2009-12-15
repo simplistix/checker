@@ -49,8 +49,9 @@ def test_suite():
             normal.append(p)
 
     s = TestSuite()
-    s.addTests(MTestSuite(m,*buildout,
+    s.addTests(MTestSuite(m,
                           setUp=setUp,
-                          tearDown=buildoutTearDown))
+                          tearDown=buildoutTearDown,
+                          *buildout))
     s.addTests(MTestSuite(m,*normal))
     return s
