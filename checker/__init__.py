@@ -1,5 +1,59 @@
-#!/usr/bin/python
+# Copyright (c) 2009 Simplistix Ltd
+#
+# See license.txt for more details.
+
+import argparse
 import os
+import sys
+
+from cStringIO import StringIO
+from logging import getLogger
+from zope.dottedname.resolve import resolve
+
+logger = getLogger()
+
+def check(checker,param):
+    c = resolve('checker.checkers.%s.check'%checker)
+    out = StringIO()
+    try:
+        original_out = sys.stdout
+        sys.stdout = out
+        original_err = sys.stderr
+        sys.stderr = out
+        c(param)
+    finally:
+        sys.stdout = original_out
+        sys.stderr = original_err
+    # print out.getvalue()
+        
+special = (
+    'config_checker',
+    )
+
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-C',default='/config',dest='config_folder')
+    args = parser.parse_args(argv)
+    args.config_checker = 'svn'
+    checkers = []
+    for line in open(os.path.join(args.config_folder,'checker.txt'),'rU'):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith('#'):
+            continue
+        c = line.split(':',1)
+        if len(c)!=2:
+            raise ValueError('No colon found on a line in checker.txt')
+        if c[0] in special:
+            setattr(args,c[0],c[1])
+        else:
+            checkers.append(c)
+    for c in checkers:
+        check(*c)
+    check(args.config_checker,args.config_folder)
+
+# old below here
 import re
 import shutil
 import sys
@@ -23,7 +77,7 @@ def svn_up_and_status(path):
     os.system(svn+'up -q '+path)
     svn_status(path)
 
-def main():
+def old_main():
     # make sure we have the latest config
     os.system(svn+' up -q '+config)
 

@@ -1,14 +1,80 @@
-# (c) Simplistix Ltd 2009, all rights reserved.
+# Copyright (c) 2009 Simplistix Ltd
+#
+# See license.txt for more details.
 
 import logging
-import os,time
+import os,sys,time
 
+from checker import main
 from mock import Mock
 from functools import partial
-from process import main
-from setuplogging.tests import EnvironmentModule
+from sys import argv
 from testfixtures import compare,Comparison as C,TempDirectory,Replacer,LogCapture,test_datetime
 from unittest import TestCase
+
+class BaseContext:
+
+    def setUp(self):
+        pass
+    
+    def __init__(self,*args,**kw):
+        self.r = Replacer()
+        self.cleanups = [self.r.restore]
+        self.setUp(*args,**kw)
+        
+    def __enter__(self):
+        return self
+    
+    def __exit__(self,*args):
+        for c in self.cleanups:
+            c()
+    
+class OpenRaisesContext(BaseContext):
+
+    def setUp(self,argv):
+        def dummy_open(path,mode):
+            raise IOError('%r %r'%(path.replace(os.sep,'/'),mode))
+        self.r.replace('sys.argv',argv)
+        self.r.replace('checker.open',dummy_open,strict=False)
+        
+class ConfigContext(BaseContext):
+
+    def setUp(self):
+        self.dir = TempDirectory()
+        self.cleanups.append(self.dir.cleanup)        
+        self.checked = Mock()
+        def check(checker,param):
+            getattr(self.checked,checker)(param)
+        self.r.replace('checker.check',check)
+
+    def run_with_config(self,config):
+        self.dir.write('checker.txt',config)
+        main(('-C '+self.dir.path).split())
+
+    def check_checkers_called(self,*expected):
+        compare(self.checked.method_calls,list(expected))
+
+class EmailContext(BaseContext):
+
+    def setUp(self):
+        self.dir = TempDirectory()
+        self.cleanups.append(self.dir.cleanup)        
+        self.smtp = Mock()
+        self.smtp.return_value = self.smtp.i
+        # self.r.replace('checker.SMTP',self.smtp)
+        def resolve(dotted):
+            def the_checker(param):
+                print 'stdout',dotted,param
+                print >>sys.stderr, 'stderr',dotted,param
+            return the_checker
+        self.r.replace('checker.resolve',resolve)
+        
+    def run_with_config(self,config):
+        config+='\nreal:checker'
+        self.dir.write('checker.txt',config)
+        main(('-C '+self.dir.path).split())
+
+# old!
 
 j = os.path.join
 

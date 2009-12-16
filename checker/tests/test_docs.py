@@ -31,6 +31,7 @@ checker = RENormalizing([
 def setUp(test):
     buildoutSetUp(test)
     install('zc.recipe.egg',test)
+    install('argparse',test)
     install_develop('checker',test)
     
 def test_suite():
