@@ -44,12 +44,12 @@ configurations to be checked, for example::
       c.run_with_config(checker_txt)
       # order matters here!
       c.check_checkers_called(
-                ('path',('/some/folder',),{}),
-                ('path',('/some/file',),{}),
-                ('crontab',('root',),{}),
-                ('svn',('/some/checkout',),{}),
-                ('buildout',('/some/buildout',),{}),
-                ('svn',(c.dir.path,),{}),
+                ('path',(c.dir.path,'/some/folder',),{}),
+                ('path',(c.dir.path,'/some/file',),{}),
+                ('crontab',(c.dir.path,'root',),{}),
+                ('svn',(c.dir.path,'/some/checkout',),{}),
+                ('buildout',(c.dir.path,'/some/buildout',),{}),
+                ('svn',(c.dir.path,c.dir.path,),{}),
       )
 
 Each one of these lines starts with the name of a checker followed by
@@ -72,7 +72,7 @@ follows::
   with ConfigContext() as c:
       c.run_with_config(checker_txt)
       c.check_checkers_called(
-                ('buildout',(c.dir.path,),{}),
+                ('buildout',(c.dir.path,c.dir.path,),{}),
       )
 
 At the moment, the only sensible choices for the implicit checker are
@@ -141,5 +141,3 @@ are not present, the following defaults will be used:
 
 `email_smtphost`
   This defaults to `localhost`.
-
-XXX - disable email

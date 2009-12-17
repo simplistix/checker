@@ -51,8 +51,8 @@ class ConfigContext(DirLoggerContext):
     def setUp(self):
         DirLoggerContext.setUp(self)
         self.checked = Mock()
-        def check(checker,param):
-            getattr(self.checked,checker)(param)
+        def check(config_folder,checker,param):
+            getattr(self.checked,checker)(config_folder,param)
         self.r.replace('checker.check',check)
 
     def run_with_config(self,config):
@@ -67,7 +67,7 @@ class OutputtingContext(DirLoggerContext):
     def setUp(self):
         DirLoggerContext.setUp(self)
         def resolve(dotted):
-            def the_checker(param):
+            def the_checker(config,param):
                 return dotted
             return the_checker
         self.r.replace('checker.resolve',resolve)

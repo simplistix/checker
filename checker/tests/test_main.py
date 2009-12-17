@@ -29,30 +29,30 @@ class TestMain2(TestCase):
     def test_ignore_whitespace_lines(self):
         self.c.run_with_config(" \t\nt1:arg\n")
         self.c.check_checkers_called(
-                ('t1',('arg',),{}),
-                ('svn',(self.c.dir.path,),{}),
+                ('t1',(self.c.dir.path,'arg',),{}),
+                ('svn',(self.c.dir.path,self.c.dir.path,),{}),
                 )
 
     def test_uniform_line_endings(self):
         self.c.run_with_config(" \t\nt1:arg1\r\nt2:arg2\n")
         self.c.check_checkers_called(
-                ('t1',('arg1',),{}),
-                ('t2',('arg2',),{}),
-                ('svn',(self.c.dir.path,),{}),
+                ('t1',(self.c.dir.path,'arg1',),{}),
+                ('t2',(self.c.dir.path,'arg2',),{}),
+                ('svn',(self.c.dir.path,self.c.dir.path,),{}),
                 )
 
     def test_missing_line_ending_okay(self):
         self.c.run_with_config("t2:arg")
         self.c.check_checkers_called(
-                ('t2',('arg',),{}),
-                ('svn',(self.c.dir.path,),{}),
+                ('t2',(self.c.dir.path,'arg',),{}),
+                ('svn',(self.c.dir.path,self.c.dir.path,),{}),
                 )
 
     def test_colon_in_parameter(self):
         self.c.run_with_config("t2:argpt1:argpt2")
         self.c.check_checkers_called(
-                ('t2',('argpt1:argpt2',),{}),
-                ('svn',(self.c.dir.path,),{}),
+                ('t2',(self.c.dir.path,'argpt1:argpt2',),{}),
+                ('svn',(self.c.dir.path,self.c.dir.path,),{}),
                 )
 
     def test_no_colon_in_line(self):
@@ -74,7 +74,7 @@ class TestCheck(TestCase):
     def checker_returns(self,output):
         resolve = Mock()
         self.r.replace('checker.resolve',resolve)
-        def the_checker(param):
+        def the_checker(config_folder,param):
             return output
         resolve.return_value = the_checker
         return resolve
@@ -82,32 +82,32 @@ class TestCheck(TestCase):
     def test_bad_checker(self):
         from checker import check
         check = should_raise(check,ImportError('No module named unknown'))
-        check('unknown',None)
+        check('/config','unknown',None)
 
     def test_normal(self):
         m = self.checker_returns('some output')
-        check('achecker',None)
+        check('/config','achecker',None)
         compare(m.call_args_list,[
                 (('checker.checkers.achecker.check',), {})
                 ])
 
     def test_log_newline(self):
         self.checker_returns('some output\n')
-        check('achecker','aparam')
+        check('/config','achecker','aparam')
         self.l.check(
             ('root', 'INFO', 'some output'),
             )
 
     def test_log_no_newline(self):
         self.checker_returns('some output')
-        check('achecker','aparam')
+        check('/config','achecker','aparam')
         self.l.check(
             ('root', 'INFO', 'some output'),
             )
         
     def test_no_log_empty(self):
         self.checker_returns('')
-        check('achecker','aparam')
+        check('/config','achecker','aparam')
         self.l.check()
 
 class TestEmail(TestCase):

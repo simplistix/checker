@@ -12,8 +12,11 @@ from zope.dottedname.resolve import resolve
 
 logger = getLogger()
 
-def check(checker,param):
-    output = resolve('checker.checkers.%s.check'%checker)(param)
+def check(config_folder,checker,param):
+    output = resolve('checker.checkers.%s.check'%checker)(
+        config_folder,
+        param
+        )
     if output.endswith('\n'):
         output = output[:-1]
     if output:
@@ -61,8 +64,8 @@ def main(argv=None):
         handler = StreamHandler(sys.stdout)
     logger.addHandler(handler)
     for c in checkers:
-        check(*c)
-    check(args.config_checker,args.config_folder)
+        check(args.config_folder,*c)
+    check(args.config_folder,args.config_checker,args.config_folder)
 
 # old below here
 import re
