@@ -97,12 +97,8 @@ will be emailed to the user running the cron job.
    >>> from logging import getLogger
    >>> with OutputtingContext() as c:
    ...   c.run_with_config('')
-   stdout checker.checkers.real.check
-   stderr checker.checkers.real.check
-   <BLANKLINE>
-   stdout checker.checkers.svn.check
-   stderr checker.checkers.svn.check
-   <BLANKLINE>
+   checker.checkers.real.check
+   checker.checkers.svn.check
  
    OutputtingContext provides the checker to run, and we get the
    default svn one too.

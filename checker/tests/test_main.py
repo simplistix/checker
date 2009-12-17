@@ -8,7 +8,7 @@ import os,sys
 from base import OpenRaisesContext,ConfigContext, OutputtingContext
 from checker import main, check
 from mock import Mock
-from testfixtures import replace,should_raise,compare,log_capture
+from testfixtures import Replacer,should_raise,compare,LogCapture
 from unittest import TestSuite,TestCase,makeSuite
 
 class TestMain(TestCase):
@@ -62,39 +62,53 @@ class TestMain2(TestCase):
             )("foo")
 
 class TestCheck(TestCase):
-                           
+
+    def setUp(self):
+        self.r = Replacer()
+        self.l = LogCapture()
+
+    def tearDown(self):
+        self.l.uninstall()
+        self.r.restore()
+
+    def checker_returns(self,output):
+        resolve = Mock()
+        self.r.replace('checker.resolve',resolve)
+        def the_checker(param):
+            return output
+        resolve.return_value = the_checker
+        return resolve
+        
     def test_bad_checker(self):
         from checker import check
         check = should_raise(check,ImportError('No module named unknown'))
         check('unknown',None)
 
-    @replace('checker.resolve',Mock())
-    def test_normal(self,m):
+    def test_normal(self):
+        m = self.checker_returns('some output')
         check('achecker',None)
         compare(m.call_args_list,[
                 (('checker.checkers.achecker.check',), {})
                 ])
 
-    @log_capture()
-    @replace('checker.resolve',Mock())
-    def test_log_stderr_and_stdout(self,r,l):
-        def the_checker(param):
-            print 'stdout',param
-            print >>sys.stderr, 'stderr',param
-        r.return_value = the_checker
+    def test_log_newline(self):
+        self.checker_returns('some output\n')
         check('achecker','aparam')
-        l.check(
-            ('root', 'INFO', 'stdout aparam\nstderr aparam\n'),
+        self.l.check(
+            ('root', 'INFO', 'some output'),
             )
 
-    @log_capture()
-    @replace('checker.resolve',Mock())
-    def test_no_log_empty(self,r,l):
-        def the_checker(param):
-            pass
-        r.return_value = the_checker
+    def test_log_no_newline(self):
+        self.checker_returns('some output')
         check('achecker','aparam')
-        l.check()
+        self.l.check(
+            ('root', 'INFO', 'some output'),
+            )
+        
+    def test_no_log_empty(self):
+        self.checker_returns('')
+        check('achecker','aparam')
+        self.l.check()
 
 class TestEmail(TestCase):
 

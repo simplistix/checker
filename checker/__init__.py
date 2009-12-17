@@ -6,7 +6,6 @@ import argparse
 import os
 import sys
 
-from cStringIO import StringIO
 from logging import getLogger,StreamHandler,INFO
 from mailinglogger.SummarisingLogger import SummarisingLogger
 from zope.dottedname.resolve import resolve
@@ -14,18 +13,9 @@ from zope.dottedname.resolve import resolve
 logger = getLogger()
 
 def check(checker,param):
-    c = resolve('checker.checkers.%s.check'%checker)
-    out = StringIO()
-    try:
-        original_out = sys.stdout
-        #sys.stdout = out
-        original_err = sys.stderr
-        #sys.stderr = out
-        c(param)
-    finally:
-        sys.stdout = original_out
-        sys.stderr = original_err
-    output = out.getvalue()    
+    output = resolve('checker.checkers.%s.check'%checker)(param)
+    if output.endswith('\n'):
+        output = output[:-1]
     if output:
         logger.info(output)
         

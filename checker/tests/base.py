@@ -68,8 +68,7 @@ class OutputtingContext(DirLoggerContext):
         DirLoggerContext.setUp(self)
         def resolve(dotted):
             def the_checker(param):
-                print 'stdout',dotted
-                print >>sys.stderr, 'stderr',dotted
+                return dotted
             return the_checker
         self.r.replace('checker.resolve',resolve)
         
