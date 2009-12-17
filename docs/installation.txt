@@ -37,3 +37,8 @@ __ http://pypi.python.org/pypi/zc.recipe.egg
 
 This will give you an executable ``checker`` script in the ``bin``
 directory of your buildout.
+
+A recommended way to install Checker is to have the :ref:`configuration
+folder <configuration-folder>` be a subversion checkout containing
+:file:`buildout.cfg`, :file:`bootstrap.py` and your
+:file:`checker.txt`.

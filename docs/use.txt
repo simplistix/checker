@@ -23,6 +23,8 @@ command line options to the checker script::
   with OpenRaisesContext(command.split()) as c:
       should_raise(main,IOError("'/some/folder/checker.txt' 'rU'"))()
 
+.. _configuration-folder:
+
 Within the configuration folder, Checker looks for a file called
 :file:`checker.txt` that contains a list of rows defining the
 configurations to be checked, for example::
