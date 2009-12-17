@@ -32,6 +32,8 @@ def setUp(test):
     buildoutSetUp(test)
     install('zc.recipe.egg',test)
     install('argparse',test)
+    install('mailinglogger',test)
+    install('zope.dottedname',test)
     install_develop('checker',test)
     
 def test_suite():

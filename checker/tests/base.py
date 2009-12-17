@@ -2,15 +2,12 @@
 #
 # See license.txt for more details.
 
-import logging
-import os,sys,time
+import atexit,os,sys
 
 from checker import main
 from mock import Mock
-from functools import partial
-from sys import argv
-from testfixtures import compare,Comparison as C,TempDirectory,Replacer,LogCapture,test_datetime
-from unittest import TestCase
+# from functools import partial
+from testfixtures import compare,Comparison as C,TempDirectory,Replacer
 
 class BaseContext:
 
@@ -36,12 +33,23 @@ class OpenRaisesContext(BaseContext):
             raise IOError('%r %r'%(path.replace(os.sep,'/'),mode))
         self.r.replace('sys.argv',argv)
         self.r.replace('checker.open',dummy_open,strict=False)
-        
-class ConfigContext(BaseContext):
 
+class DirLoggerContext(BaseContext):
+    
     def setUp(self):
         self.dir = TempDirectory()
-        self.cleanups.append(self.dir.cleanup)        
+        self.cleanups.extend([self.dir.cleanup,self.removeAtExit])
+        self.handlers = []
+        self.r.replace('checker.logger.handlers',self.handlers)
+
+    def removeAtExit(self):
+        # make sure we haven't registered any atexit funcs
+        atexit._exithandlers[:] = []
+        
+class ConfigContext(DirLoggerContext):
+
+    def setUp(self):
+        DirLoggerContext.setUp(self)
         self.checked = Mock()
         def check(checker,param):
             getattr(self.checked,checker)(param)
@@ -54,18 +62,14 @@ class ConfigContext(BaseContext):
     def check_checkers_called(self,*expected):
         compare(self.checked.method_calls,list(expected))
 
-class EmailContext(BaseContext):
+class OutputtingContext(DirLoggerContext):
 
     def setUp(self):
-        self.dir = TempDirectory()
-        self.cleanups.append(self.dir.cleanup)        
-        self.smtp = Mock()
-        self.smtp.return_value = self.smtp.i
-        # self.r.replace('checker.SMTP',self.smtp)
+        DirLoggerContext.setUp(self)
         def resolve(dotted):
             def the_checker(param):
-                print 'stdout',dotted,param
-                print >>sys.stderr, 'stderr',dotted,param
+                print 'stdout',dotted
+                print >>sys.stderr, 'stderr',dotted
             return the_checker
         self.r.replace('checker.resolve',resolve)
         
@@ -74,7 +78,22 @@ class EmailContext(BaseContext):
         self.dir.write('checker.txt',config)
         main(('-C '+self.dir.path).split())
 
+    def check_email_config(self,from_,to_,subject,smtphost):
+        compare([C('mailinglogger.SummarisingLogger.SummarisingLogger',
+                   mailer=C('mailinglogger.MailingLogger.MailingLogger',
+                            fromaddr=from_,
+                            toaddrs=to_,
+                            subject=subject,
+                            mailhost=smtphost,
+                            send_empty_entries=False,
+                            strict=False,
+                            ),
+                   strict=False,
+                   )],self.handlers)
+
 # old!
+from unittest import TestCase
+import logging
 
 j = os.path.join
 

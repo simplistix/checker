@@ -25,6 +25,8 @@ setup(
     zip_safe=False,
     install_requires = [
         'argparse',
+        'mailinglogger',
+        'zope.dottedname',
         ],
     entry_points=dict(
         console_scripts = [

@@ -7,7 +7,8 @@ import os
 import sys
 
 from cStringIO import StringIO
-from logging import getLogger
+from logging import getLogger,StreamHandler,INFO
+from mailinglogger.SummarisingLogger import SummarisingLogger
 from zope.dottedname.resolve import resolve
 
 logger = getLogger()
@@ -17,17 +18,23 @@ def check(checker,param):
     out = StringIO()
     try:
         original_out = sys.stdout
-        sys.stdout = out
+        #sys.stdout = out
         original_err = sys.stderr
-        sys.stderr = out
+        #sys.stderr = out
         c(param)
     finally:
         sys.stdout = original_out
         sys.stderr = original_err
-    # print out.getvalue()
+    output = out.getvalue()    
+    if output:
+        logger.info(output)
         
 special = (
     'config_checker',
+    'email_to',
+    'email_from',
+    'email_subject',
+    'email_smtphost',
     )
 
 def main(argv=None):
@@ -49,6 +56,20 @@ def main(argv=None):
             setattr(args,c[0],c[1])
         else:
             checkers.append(c)
+    logger.setLevel(INFO)
+    if getattr(args,'email_to',None):
+        to_ = [e.strip() for e in args.email_to.split(',')]
+        from_ = getattr(args,'email_from',to_[0]).strip()
+        handler = SummarisingLogger(
+            from_,to_,
+            subject=getattr(args,'email_subject',
+                            'Checker output from %(hostname)s').strip(),
+            mailhost=getattr(args,'email_smtphost','localhost').strip(),
+            send_empty_entries=False,
+            )
+    else:
+        handler = StreamHandler(sys.stdout)
+    logger.addHandler(handler)
     for c in checkers:
         check(*c)
     check(args.config_checker,args.config_folder)

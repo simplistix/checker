@@ -3,12 +3,12 @@
 # See license.txt for more details.
 from __future__ import with_statement
 
-import os
+import os,sys
 
-from base import OpenRaisesContext,ConfigContext
-from checker import main
+from base import OpenRaisesContext,ConfigContext, OutputtingContext
+from checker import main, check
 from mock import Mock
-from testfixtures import replace,should_raise,compare
+from testfixtures import replace,should_raise,compare,log_capture
 from unittest import TestSuite,TestCase,makeSuite
 
 class TestMain(TestCase):
@@ -70,26 +70,64 @@ class TestCheck(TestCase):
 
     @replace('checker.resolve',Mock())
     def test_normal(self,m):
-        from checker import check
         check('achecker',None)
         compare(m.call_args_list,[
                 (('checker.checkers.achecker.check',), {})
                 ])
 
+    @log_capture()
+    @replace('checker.resolve',Mock())
+    def test_log_stderr_and_stdout(self,r,l):
+        def the_checker(param):
+            print 'stdout',param
+            print >>sys.stderr, 'stderr',param
+        r.return_value = the_checker
+        check('achecker','aparam')
+        l.check(
+            ('root', 'INFO', 'stdout aparam\nstderr aparam\n'),
+            )
+
+    @log_capture()
+    @replace('checker.resolve',Mock())
+    def test_no_log_empty(self,r,l):
+        def the_checker(param):
+            pass
+        r.return_value = the_checker
+        check('achecker','aparam')
+        l.check()
+
 class TestEmail(TestCase):
 
-    def test_default_from(self):
-        pass
+    def setUp(self):
+        self.c = OutputtingContext()
+
+    def tearDown(self):
+        self.c.__exit__()
+
+    def test_defaults(self):
+        self.c.run_with_config('email_to:recipient@example.com')
+        self.c.check_email_config(
+            'recipient@example.com',
+            ['recipient@example.com'],
+            'Checker output from %(hostname)s',
+            'localhost',
+            )
     
-    def test_default_subject(self):
-        pass
-    
-    def test_default_smtphost(self):
-        pass
+    def test_default_from_multiple_to(self):
+        self.c.run_with_config(
+            'email_to:r1@example.com, r2@example.com'
+            )
+        self.c.check_email_config(
+            'r1@example.com',
+            ['r1@example.com','r2@example.com'],
+            'Checker output from %(hostname)s',
+            'localhost',
+            )
     
 def test_suite():
     return TestSuite((
         makeSuite(TestMain),
         makeSuite(TestMain2),
         makeSuite(TestCheck),
+        makeSuite(TestEmail),
         ))

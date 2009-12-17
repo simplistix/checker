@@ -5,7 +5,7 @@ Using Checker
 
   from testfixtures import should_raise,compare
   from checker.tests.base import OpenRaisesContext,ConfigContext
-  from checker.tests.base import EmailContext
+  from checker.tests.base import OutputtingContext
   from checker import main
 
 Once installed, checker is used by executing the the checker script.
@@ -91,6 +91,22 @@ By default, any changes found by a checker are printed to stdout. This
 makes Checker ideal for running as a nightly cron job where the output
 will be emailed to the user running the cron job.
 
+.. it's not important to show in the docs, but a doctest is a really
+   good way of showing the output to stdout:
+
+   >>> from logging import getLogger
+   >>> with OutputtingContext() as c:
+   ...   c.run_with_config('')
+   stdout checker.checkers.real.check
+   stderr checker.checkers.real.check
+   <BLANKLINE>
+   stdout checker.checkers.svn.check
+   stderr checker.checkers.svn.check
+   <BLANKLINE>
+ 
+   OutputtingContext provides the checker to run, and we get the
+   default svn one too.
+
 However, on some systems, output from scheduled tasks is not emailed
 to the user running the task. In this case, some special lines may be
 added to :file:`checker.txt` as follows::
@@ -98,15 +114,21 @@ added to :file:`checker.txt` as follows::
   email_to: recipient1@example.com,recipient2@example.com
   email_from: sender@example.com
   email_subject: Checker output from myhost
-  email_smtphost: localhost
+  email_smtphost: smtp.example.com
 
 .. -> checker_txt
 
 .. invisible-code-block: python
 
   from __future__ import with_statement
-  with EmailContext() as c:
+  with OutputtingContext() as c:
       c.run_with_config(checker_txt)
+      c.check_email_config(
+          'sender@example.com',
+          ['recipient1@example.com', 'recipient2@example.com'],
+          'Checker output from myhost',
+          'smtp.example.com',
+          )
 
 Only `email_to` is required, and once specified, if the other options
 are not present, the following defaults will be used:
