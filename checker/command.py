@@ -4,10 +4,11 @@
 
 from subprocess import Popen,PIPE,STDOUT
 
-def execute(command):
+def execute(command,cwd=None):
     return Popen(
         command.split(),
         stderr=STDOUT,
         stdout=PIPE,
         universal_newlines=True,
+        cwd=cwd
         ).communicate()[0]

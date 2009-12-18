@@ -33,6 +33,16 @@ class TestExecute(TestCase):
         compare("[%r, 'x=1', '--y=2', 'a', 'b']\n" % path,
                 execute(sys.executable+' '+path+' x=1 --y=2 a b'))
     
+    @tempdir()
+    def test_working_directory(self,d):
+        dir = d.makedir('a_dir',path=True)
+        path = d.write('test.py','\n'.join((
+                "import os",
+                "print os.getcwd()",
+                )),path=True)
+        compare(dir+'\n',
+                execute(sys.executable+' '+path,cwd=dir))
+    
 def test_suite():
     return TestSuite((
         makeSuite(TestExecute),
