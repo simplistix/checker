@@ -6,6 +6,7 @@ from __future__ import with_statement
 import os,sys
 
 from base import OpenRaisesContext,ConfigContext, OutputtingContext
+from base import ContextTest,cleanup
 from checker import main, check
 from mock import Mock
 from testfixtures import Replacer,should_raise,compare,LogCapture
@@ -18,13 +19,15 @@ class TestMain(TestCase):
             # make sure we look for the config in /config by default
             should_raise(main,IOError("'/config/checker.txt' 'rU'"))()
 
-class TestMain2(TestCase):
+    def test_abspath_config_folder(self):
+        with OpenRaisesContext('ascript -C config'.split()) as c:
+            # make any config specified is abspath'ed
+            path = cleanup(os.path.abspath('config/checker.txt'))
+            should_raise(main,IOError("%r 'rU'" % path))()
 
-    def setUp(self):
-        self.c = ConfigContext()
+class TestMain2(ContextTest):
 
-    def tearDown(self):
-        self.c.__exit__()
+    context = ConfigContext
 
     def test_ignore_whitespace_lines(self):
         self.c.run_with_config(" \t\nt1:arg\n")
@@ -110,14 +113,10 @@ class TestCheck(TestCase):
         check('/config','achecker','aparam')
         self.l.check()
 
-class TestEmail(TestCase):
+class TestEmail(ContextTest):
 
-    def setUp(self):
-        self.c = OutputtingContext()
-
-    def tearDown(self):
-        self.c.__exit__()
-
+    context = OutputtingContext
+    
     def test_defaults(self):
         self.c.run_with_config('email_to:recipient@example.com')
         self.c.check_email_config(

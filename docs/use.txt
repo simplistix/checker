@@ -8,7 +8,7 @@ Using Checker
   from checker.tests.base import OutputtingContext
   from checker import main
 
-Once installed, checker is used by executing the the checker script.
+Once installed, checker is used by executing the checker script.
 This will look for a configuration, by default located in
 :file:`/config`. The configuration location can be overriden with a
 command line options to the checker script::
@@ -78,7 +78,24 @@ follows::
       )
 
 At the moment, the only sensible choices for the implicit checker are
-`svn` or `buildout`.
+`svn`, `buildout` or `svn,buildout` to indicate the `svn` checker
+should be used followed by the `buildout` checker::
+
+  config_checker:svn,buildout
+
+.. -> checker_txt
+
+.. invisible-code-block: python
+
+  from __future__ import with_statement
+  with ConfigContext() as c:
+      c.run_with_config(checker_txt)
+      c.check_checkers_called(
+                ('svn',(c.dir.path,c.dir.path,),{}),
+                ('buildout',(c.dir.path,c.dir.path,),{}),
+      )
+
+
 
 .. note::
 

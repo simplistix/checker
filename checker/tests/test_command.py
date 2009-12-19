@@ -1,10 +1,14 @@
 # Copyright (c) 2009 Simplistix Ltd
 #
 # See license.txt for more details.
+from __future__ import with_statement
+
 import sys
 
 from checker.command import execute
-from testfixtures import tempdir,compare
+from mock import Mock
+from subprocess import PIPE,STDOUT
+from testfixtures import tempdir,compare,Replacer
 from unittest import TestSuite,TestCase,makeSuite
 
 class TestExecute(TestCase):
@@ -42,6 +46,24 @@ class TestExecute(TestCase):
                 )),path=True)
         compare(dir+'\n',
                 execute(sys.executable+' '+path,cwd=dir))
+
+    def test_popen_params(self):
+        m = Mock()
+        m.Popen.return_value = m.Popeni
+        m.Popeni.communicate.return_value=('','')
+        with Replacer() as r:
+            r.replace('checker.command.Popen',m.Popen)
+            execute('something')
+        compare(m.method_calls,[
+                ('Popen',
+                 ('something',),
+                 {'cwd': None,
+                  'shell': True,
+                  'stderr': STDOUT,
+                  'stdout': PIPE,
+                  'universal_newlines': True}),
+                ('Popeni.communicate', (), {})
+                ])
     
 def test_suite():
     return TestSuite((

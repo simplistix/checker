@@ -2,10 +2,14 @@
 #
 # See license.txt for more details.
 
-from cStringIO import StringIO
-from subprocess import Popen,PIPE,STDOUT
-import sys
+from checker import command
+from re import compile,MULTILINE
 
-def check(param):
-    process = Popen('echo foo',shell=True,stderr=STDOUT,stdout=PIPE)
-    print process.communicate()
+svnexternal_re = compile(
+    "(^X.*\n)|(\nPerforming status on external item at '.*')\n",
+    MULTILINE
+    )
+
+def check(config_folder,path):    
+    command.execute('svn up -q '+path)
+    return svnexternal_re.sub('',command.execute('svn status '+path))

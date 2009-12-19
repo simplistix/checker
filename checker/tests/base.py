@@ -1,13 +1,16 @@
 # Copyright (c) 2009 Simplistix Ltd
 #
 # See license.txt for more details.
+from __future__ import with_statement
 
-import atexit,os,sys
+import atexit,os,re,sys
 
 from checker import main
 from mock import Mock
-# from functools import partial
-from testfixtures import compare,Comparison as C,TempDirectory,Replacer
+from os.path import exists
+from testfixtures import compare,Comparison as C,TempDirectory
+from testfixtures import LogCapture,Replacer
+from unittest import TestCase
 
 class BaseContext:
 
@@ -26,46 +29,66 @@ class BaseContext:
         for c in self.cleanups:
             c()
     
+class ContextTest(TestCase):
+
+    def setUp(self):
+        self.c = self.context()
+
+    def tearDown(self):
+        self.c.__exit__()
+
+
+def cleanup(path):
+    # cross-platform:
+    # always /-separated
+    path = path.replace(os.sep,'/')
+    # remove drive on windows
+    path = path.split('/')
+    path[0]=''        
+    return '/'.join(path)
+    
 class OpenRaisesContext(BaseContext):
 
     def setUp(self,argv):
         def dummy_open(path,mode):
-            raise IOError('%r %r'%(path.replace(os.sep,'/'),mode))
+            raise IOError('%r %r'%(cleanup(path),mode))
         self.r.replace('sys.argv',argv)
         self.r.replace('checker.open',dummy_open,strict=False)
 
-class DirLoggerContext(BaseContext):
+class DirHandlerContext(BaseContext):
     
     def setUp(self):
         self.dir = TempDirectory()
         self.cleanups.extend([self.dir.cleanup,self.removeAtExit])
+        # This one is so that we can check what log handlers
+        # get added.
         self.handlers = []
         self.r.replace('checker.logger.handlers',self.handlers)
-
-    def removeAtExit(self):
-        # make sure we haven't registered any atexit funcs
-        atexit._exithandlers[:] = []
-        
-class ConfigContext(DirLoggerContext):
-
-    def setUp(self):
-        DirLoggerContext.setUp(self)
-        self.checked = Mock()
-        def check(config_folder,checker,param):
-            getattr(self.checked,checker)(config_folder,param)
-        self.r.replace('checker.check',check)
 
     def run_with_config(self,config):
         self.dir.write('checker.txt',config)
         main(('-C '+self.dir.path).split())
 
+    def removeAtExit(self):
+        # make sure we haven't registered any atexit funcs
+        atexit._exithandlers[:] = []
+        
+class ConfigContext(DirHandlerContext):
+
+    def setUp(self):
+        DirHandlerContext.setUp(self)
+        self.checked = Mock()
+        def check(config_folder,checker,param):
+            getattr(self.checked,checker)(config_folder,param)
+        self.r.replace('checker.check',check)
+
     def check_checkers_called(self,*expected):
         compare(self.checked.method_calls,list(expected))
 
-class OutputtingContext(DirLoggerContext):
+class OutputtingContext(DirHandlerContext):
 
     def setUp(self):
-        DirLoggerContext.setUp(self)
+        DirHandlerContext.setUp(self)
         def resolve(dotted):
             def the_checker(config,param):
                 return dotted
@@ -90,140 +113,66 @@ class OutputtingContext(DirLoggerContext):
                    strict=False,
                    )],self.handlers)
 
-# old!
-from unittest import TestCase
-import logging
+# This convoluted mess is to normalise absolute paths
+# to look like unix paths on both unix and windows :-/
+cleaner = re.compile('('+re.escape(os.path.abspath('/'))+'\\\\?)|'+re.escape('\\')+'{1,2}')
 
-j = os.path.join
+class CommandContext(DirHandlerContext):
 
-class runCommand:
-
-    def __init__(self,var):
-        self.responses = {}
-        self.effects = {}
-        self.command_to_tag = {}
-        self.called=[]
-        self.var = var
-
-    def add(self,command,response='',effect=None):
-        self.responses[command]=response
-        if effect:
-            self.effects[command]=effect
-        return command
-            
-    def __call__(self,command,log=True):
-        r = self.responses.get(command,'')
-        e = self.effects.get(command)
-        if e: e()
-        self.called.append((command,log))
-        return r
-
-    # helpers
-
-    def write_files(self,*sets):
-        for path,content in sets:
-            dirpath = path[:-1]
-            if dirpath:
-                dirpath = os.path.join(*dirpath)
-                if not os.path.exists(dirpath):
-                    os.makedirs(dirpath)
-            f = open(os.path.join(*path),'wb')
-            f.write(content)
-            f.close()
-            
-    def wget(self,day,user,passwd,url,*sets):
-        
-        wget = (
-            'wget -m -k -K -a '+j(self.var.path,'wget-'+user+'-'+day+'.log')+
-            ' -nv -x -E --http-user=%s --http-passwd=%s %s'
-            )%(user,passwd,url)
-
-        self.add(wget,effect=partial(self.write_files,*sets))
-
-        return wget
+    def exists(self,path):
+        if cleanup(path) in self.existing_paths:
+            return True
+        return exists(path)
     
-    def unzip(self,date,user,passwd,*sets):
-        # sets should be the same as those passed to wget!
-        basepath = (self.var.path,'www','static',user)
-        unzip = (
-            'unzip -q -o -P %s -d '+j(*basepath)+' '+
-            j(self.var.path,'www',user,date+'.zip')
-            ) % (passwd,)
+    def setUp(self):
+        DirHandlerContext.setUp(self)
+        self.r.replace('checker.command.execute',self)
+        self.r.replace('os.path.exists',self.exists)
+        self.existing_paths = set()
+        self.called=[]
+        self.expected={}
+        self.config_folder = self.dir.path
 
-        nsets = []
-        for path,content in sets:
-            nsets.append((basepath+path[1:],content))
-                         
-        self.add(unzip,effect=partial(self.write_files,*nsets))
+    def run_with_config(self,config):
+        with LogCapture() as output:
+            with Replacer() as r:
+                # This one is so that there is no output...
+                r.replace('checker.StreamHandler',Mock())
+                DirHandlerContext.run_with_config(self,config)
+        # ...other than what we capture with the LogCapture
+        self.output = output
         
-        return unzip
-
-    def diff(self,user,path,response=''):
-        diff = (
-            'diff -q '+j(self.var.path,'www','static',user,*path)+' '
-            +j(self.var.path,'create',user,'premier.screendigest.com',*path)
-            )
-        self.add(diff,response=response)
-        return diff
-
-    def print_cwd(self,name):
-        print name,':',os.getcwd()
+    def __cleanup(self,command):
+        command = cleaner.sub('/',command)
+        command = command.replace(cleaner.sub('/',self.dir.path),'<config>')
+        return command
         
-    def cwd(self,name,command):
-        # handy for debugging!
-        self.add(command,effect=partial(self.print_cwd,name))
-        
-logger = logging.getLogger()
+    def __call__(self,command,cwd=None):
+        "Where the simulated call takes place"
+        command = self.__cleanup(command)
+        output,files = self.expected.get(command,('',()))
+        for path,content in files:
+            self.dir.write(path.split('/'),content)
+        if cwd:
+            self.called.append(self.__cleanup('chdir '+cwd))
+        self.called.append(command)
+        return output
 
-class BaseTestCase(TestCase):
+    def add(self,command,output='',files=()):
+        self.expected[command]=(output,files)
 
-    def setUp(self):        
-        self.e = EnvironmentModule(False)
-        self.e.install()
-        self.var = TempDirectory()
-        self.r = Replacer(replace_returns=True)
-        self.setuplogging_setup = self.r.replace('setuplogging.setup',Mock())
-        self.handlers = self.r.replace('tests.base.logger.handlers',[])
-        self.command = r = runCommand(self.var)
-        self.r.replace('handlers.runCommand',r)
-        self.r.replace('steps.runCommand',r)
-        self.r.replace('process.datetime',test_datetime())
-        self.log = LogCapture()
-        self.e.var_path = self.var.path
-        self.e.lockfile_path = os.path.join(self.var.path,'staticsite.lock')
-        self.e.full_copy_path=os.path.join(self.var.path,'fullcopy.txt')
-        self.e.site_domain = 'premier.screendigest.com'
-        self.e.site_url = 'http://'+self.e.site_domain
-        self.e.bad_phrases = ('a bad phrase',)
-        self.e.dry_run = False
-
-        self.day = time.strftime('%a')
-        self.date = time.strftime('%Y%m%d')
-
-    def tearDown(self):
-        LogCapture.uninstall_all()
-        self.r.restore()
-        TempDirectory.cleanup_all()
-        try:
-            self.e.uninstall()
-        except KeyError:
-            # already uninstalled!
-            pass
-        
-    def do_run(self,raise_on_critical=True):
-        # we do it this way to make sure that the
-        # default is correct!
-        args = []
-        if raise_on_critical:
-            args.append(True)
-        
-        main(*args)
-            
-        compare(self.handlers,
-                [C('testfixtures.LogCapture'),
-                 C('errorhandler.ErrorHandler',
-                   logger='',
-                   level=logging.ERROR,
-                   strict=False)])
-        
-        compare(self.setuplogging_setup.call_args,((),{},))
+def _listall(path,dir):
+    for (dirpath,dirnames,filenames) in sorted(os.walk(path)):
+        if dirpath!=path and dir:
+            yield dirpath
+        for name in sorted(filenames):
+            yield os.path.join(dirpath,name)
+    
+def listall(tempdir,dir=True):
+    path = tempdir.path
+    lpath = len(path)+1
+    result = []
+    for path in _listall(path,dir):
+        result.append(path[lpath:].replace(os.sep,'/'))
+    return result
+    
