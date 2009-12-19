@@ -50,6 +50,7 @@ def check(config_folder,path):
                 ):
                 dir = e.group('dir')
                 if dir:
+                    print >>f
                     print >>f,dir
                     continue
                 if e.group('path')=='..':
