@@ -14,7 +14,7 @@ def check(config_folder,daemon):
         os.mkdir(inits)
     with open(join(inits,daemon),'wb') as f:
         for row in command.execute(
-            'update-rc.d -n -f %s remove'%daemon
+            '/usr/sbin/update-rc.d -n -f %s remove'%daemon
             ).split('\n'):
             row = row.strip()
             if row.startswith('Removing'):

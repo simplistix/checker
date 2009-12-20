@@ -448,7 +448,7 @@ The `mysql` file is likely to contain something like the following::
 
 .. we expect the following command to be executed:
 
-  update-rc.d -n -f mysql remove
+  /usr/sbin/update-rc.d -n -f mysql remove
 
 .. -> command
 
@@ -457,14 +457,15 @@ The `mysql` file is likely to contain something like the following::
   from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
-    c.add('update-rc.d -n -f mysql remove',initial_content[:-1])
+    command = command.strip()
+    c.add(command,initial_content[:-1])
     #  run the config
     c.run_with_config(checker_txt)
     # check output
     c.output.check()
     # check the calls
     compare(c.called,[
-        command.strip(),
+        command,
         'svn up -q <config>',
         'svn status <config>'
         ])
