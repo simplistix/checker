@@ -228,7 +228,7 @@ the output from checker.
 .. note:: This checker requires the :command:`svn` subversion client
           to be installed.
 
-Buildout
+buildout
 --------
 
 This checker will execute a :command:`buildout -o -q` in the specified
