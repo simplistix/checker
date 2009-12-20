@@ -397,3 +397,78 @@ With :file:`dpkg` containing something like::
     # check the root file content
     compare(c.dir.read(('dpkg')),expected_content)
 
+init
+----
+
+This checker records the run levels and priorities for the daemon
+named in the parameter on Debian and Ubuntu systems.
+
+It does this by executing :command:`update-rc.d -n -f remove` for the
+daemon specified in the configuration and stores the output in a file
+in the configuration folder.
+
+For example, the following configuration line::
+
+  init:mysql
+
+.. -> checker_txt
+
+Will result in the following being present in the configuration
+folder::
+
+  checker.txt
+  init/mysql
+
+.. -> expected
+
+The `mysql` file is likely to contain something like the following::
+
+   /etc/rc0.d/K21mysql
+   /etc/rc1.d/K21mysql
+   /etc/rc2.d/S19mysql
+   /etc/rc3.d/S19mysql
+   /etc/rc4.d/S19mysql
+   /etc/rc5.d/S19mysql
+   /etc/rc6.d/K21mysql
+
+.. -> expected_content
+
+.. However, what was written likely looked more like:
+
+  Removing any system startup links for /etc/init.d/mysql ...
+    /etc/rc0.d/K21mysql
+    /etc/rc1.d/K21mysql
+    /etc/rc2.d/S19mysql
+    /etc/rc3.d/S19mysql
+    /etc/rc4.d/S19mysql
+    /etc/rc5.d/S19mysql
+    /etc/rc6.d/K21mysql
+               
+.. -> initial_content
+
+.. we expect the following command to be executed:
+
+  update-rc.d -n -f mysql remove
+
+.. -> command
+
+.. invisible-code-block: python
+
+  from __future__ import with_statement
+  with CommandContext() as c:
+    # set up the commands
+    c.add('update-rc.d -n -f mysql remove',initial_content[:-1])
+    #  run the config
+    c.run_with_config(checker_txt)
+    # check output
+    c.output.check()
+    # check the calls
+    compare(c.called,[
+        command.strip(),
+        'svn up -q <config>',
+        'svn status <config>'
+        ])
+    # check the files are as expected
+    compare(listall(c.dir,dir=False),expected.split())
+    # check the mysql file content
+    compare(c.dir.read(('init','mysql')),expected_content)
