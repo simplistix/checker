@@ -13,10 +13,12 @@ configuration data:
 
 - Subversion checkouts
 
-- Subversion checkouts that are also `buildouts`__
+- `buildouts`__
 
 - crontabs
 
 - installed Debian/Ubuntu package versions
+
+- run levels and priorities for daemons on Debian/Ubuntu systems
 
 __ http://pypi.python.org/pypi/zc.buildout
