@@ -2,7 +2,7 @@
 # See license.txt for license details.
 
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 package_name = 'checker'
 base_dir = os.path.dirname(__file__)
@@ -21,7 +21,7 @@ setup(
     'Intended Audience :: Developers',
     'License :: OSI Approved :: MIT License',
     ],    
-    packages=[package_name],
+    packages=find_packages(),
     zip_safe=False,
     install_requires = [
         'argparse',
