@@ -61,7 +61,7 @@ def check(config_folder,path):
         else:
             command.execute('cp -R %r %r'%(path,target_dir))
             for e in unix_row_re.finditer(
-                command.execute('ls -laR --time-style=+ %r'%path)
+                command.execute('LC_COLLATE="C" ls -laR --time-style=+ %r'%path)
                 ):
                 if e.group('path')=='..':
                     continue

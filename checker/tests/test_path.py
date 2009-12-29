@@ -41,7 +41,7 @@ class TestPath(ContextTest):
                 ])
         compare(self.c.called,[
                 "cp -R '/some/deep/path' '<config>/some/deep'",
-                "ls -laR --time-style=+ '/some/deep/path'",
+                "LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/deep/path'",
                 ])
 
 def test_suite():

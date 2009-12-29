@@ -67,21 +67,21 @@ unix systems::
           ('some/folder/afile.cfg','content'),
           ('some/folder/bfile.cfg','content'),
           ))
-    c.add("ls -laR --time-style=+ '/some/folder'",
+    c.add("LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/folder'",
           output=initial_content)
     c.add("cp -R '/another/file.cfg' '<config>/another'",files=(
           ('another/file.cfg','content'),
           ))
-    c.add("ls -laR --time-style=+ '/another/file.cfg'",
+    c.add("LC_COLLATE=\"C\" ls -laR --time-style=+ '/another/file.cfg'",
           output=initial_content)
     # now run the config
     c.run_with_config(checker_txt)
     # check the calls
     compare(c.called,[
         "cp -R '/some/folder' '<config>/some'",
-        "ls -laR --time-style=+ '/some/folder'",
+        "LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/folder'",
         "cp -R '/another/file.cfg' '<config>/another'",
-        "ls -laR --time-style=+ '/another/file.cfg'",
+        "LC_COLLATE=\"C\" ls -laR --time-style=+ '/another/file.cfg'",
         'svn up -q <config>',
         'svn status <config>'
         ])
