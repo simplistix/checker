@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 
@@ -32,6 +32,7 @@ def setUp(test):
     buildoutSetUp(test)
     install('zc.recipe.egg',test)
     install('argparse',test)
+    install('execute',test)
     install('mailinglogger',test)
     install('zope.dottedname',test)
     install_develop('checker',test)

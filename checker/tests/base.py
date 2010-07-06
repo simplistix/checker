@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 from __future__ import with_statement
@@ -126,7 +126,7 @@ class CommandContext(DirHandlerContext):
     
     def setUp(self):
         DirHandlerContext.setUp(self)
-        self.r.replace('checker.command.execute',self)
+        self.r.replace('execute.simple',self)
         self.r.replace('os.path.exists',self.exists)
         self.existing_paths = set()
         self.called=[]

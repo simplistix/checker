@@ -1,10 +1,10 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 
 import os
 
-from checker import command
+import execute
 from os.path import join
 
 def check(config_folder,user):
@@ -12,7 +12,7 @@ def check(config_folder,user):
     if not os.path.exists(crontabs):
         os.mkdir(crontabs)
     f = open(join(crontabs,user),'wb')
-    f.write(command.execute('crontab -l -u '+user))
+    f.write(execute.simple('crontab -l -u '+user))
     f.close()
     return ''
     

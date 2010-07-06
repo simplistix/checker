@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 # See license.txt for license details.
 
 import os
@@ -25,6 +25,7 @@ setup(
     zip_safe=False,
     install_requires = [
         'argparse',
+        'execute',
         'mailinglogger',
         'zope.dottedname',
         ],
@@ -39,7 +40,8 @@ setup(
             'mock',
             'testfixtures',
             'zc.buildout',
-            'zc.recipe.egg'
+            'zc.recipe.egg',
+            'zope.testing',
             ],
         )
     )

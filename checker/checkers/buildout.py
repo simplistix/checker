@@ -1,13 +1,13 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 
 import os
 
-from checker import command
+import execute
 
 def check(config_folder,path):
-    return command.execute(
+    return execute.simple(
         'bin'+os.sep+'buildout -o -q',
         cwd=path
         )

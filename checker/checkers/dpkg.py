@@ -1,15 +1,15 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 
 import os
 
-from checker import command
+import execute
 from os.path import join
 
 def check(config_folder,junk):
     f = open(os.path.join(config_folder,'dpkg'),'wb')
-    f.write(command.execute('dpkg -l'))
+    f.write(execute.simple('dpkg -l'))
     f.close()
     return ''
     

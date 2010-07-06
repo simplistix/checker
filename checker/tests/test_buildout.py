@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 
@@ -10,7 +10,7 @@ from unittest import TestCase,TestSuite,makeSuite
 class TestBuildout(TestCase):
 
     @replace('os.sep','|')
-    @replace('checker.command.execute',Mock())
+    @replace('execute.simple',Mock())
     def test_right_bin_buildout_path_seperator(self,m):
         m.return_value=''
         check('x','y')

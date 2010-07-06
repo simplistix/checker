@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 from __future__ import with_statement
@@ -7,7 +7,7 @@ import os
 import re
 import subprocess
 
-from checker import command
+import execute
 
 unix_row_re = re.compile(
     '^((?P<dirname>/.*:)|(?P<perms>[\w-][wrx-]{9}) '
@@ -43,8 +43,8 @@ def check(config_folder,path):
                 cp = 'copy'
             else:
                 cp = 'xcopy /I /E /Q /H /R /Y'
-            command.execute('%s "%s" "%s"'%(cp,path,tpath))
-            text = command.execute('dir /q /s "%s"' % path)
+            execute.simple('%s "%s" "%s"'%(cp,path,tpath))
+            text = execute.simple('dir /q /s "%s"' % path)
             for e in win_row_re.finditer(
                 text
                 ):
@@ -59,9 +59,9 @@ def check(config_folder,path):
                     e.group('user'),\
                     e.group('path')
         else:
-            command.execute('cp -R %r %r'%(path,target_dir))
+            execute.simple('cp -R %r %r'%(path,target_dir))
             for e in unix_row_re.finditer(
-                command.execute('LC_COLLATE="C" ls -laR --time-style=+ %r'%path)
+                execute.simple('LC_COLLATE="C" ls -laR --time-style=+ %r'%path)
                 ):
                 if e.group('path')=='..':
                     continue

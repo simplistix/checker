@@ -1,8 +1,8 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
 
-from checker import command
+import execute
 from re import compile,MULTILINE
 
 svnexternal_re = compile(
@@ -11,5 +11,5 @@ svnexternal_re = compile(
     )
 
 def check(config_folder,path):    
-    command.execute('svn up -q '+path)
-    return svnexternal_re.sub('',command.execute('svn status '+path))
+    execute.simple('svn up -q '+path)
+    return svnexternal_re.sub('',execute.simple('svn status '+path))
