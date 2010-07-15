@@ -126,7 +126,8 @@ class CommandContext(DirHandlerContext):
     
     def setUp(self):
         DirHandlerContext.setUp(self)
-        self.r.replace('execute.simple',self)
+        self.r.replace('execute.simple',self.simple)
+        self.r.replace('execute.returncode',self.returncode)
         self.r.replace('os.path.exists',self.exists)
         self.existing_paths = set()
         self.called=[]
@@ -147,19 +148,25 @@ class CommandContext(DirHandlerContext):
         command = command.replace(cleaner.sub('/',self.dir.path),'<config>')
         return command
         
-    def __call__(self,command,cwd=None):
+    def __call__(self,command,cwd):
         "Where the simulated call takes place"
         command = self.__cleanup(command)
-        output,files = self.expected.get(command,('',()))
+        output,files,returncode = self.expected.get(command,('',(),0))
         for path,content in files:
             self.dir.write(path.split('/'),content)
         if cwd:
             self.called.append(self.__cleanup('chdir '+cwd))
         self.called.append(command)
-        return output
+        return output,returncode
 
-    def add(self,command,output='',files=()):
-        self.expected[command]=(output,files)
+    def simple(self,command,cwd=None):
+        return self(command,cwd)[0]
+
+    def returncode(self,command,cwd=None):
+        return self(command,cwd)[1]
+
+    def add(self,command,output='',files=(), returncode=0):
+        self.expected[command]=(output,files,returncode)
 
 def _listall(path,dir):
     for (dirpath,dirnames,filenames) in sorted(os.walk(path)):

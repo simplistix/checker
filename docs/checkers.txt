@@ -337,15 +337,27 @@ The `root` file is likely to contain something like the following::
   For the `crontab` checker to work, Checker must be run as
   the `root` user.
 
-dpkg
-----
+os_packages
+-----------
 
-This checker executes a :command:`dpkg -l` and puts the output in file
-called `dpkg` in the configuration folder.
+This checker attempts to list the names and versions of the current
+packages installed by the operating system's package manager. 
+
+The following commands will be tried in the order shown, with the
+first command that exists being used:
+
+- :command:`dpkg -l`
+
+- :command:`yum list`
+
+- :command:`up2date --showall`
+
+The resulting output will be placed in a file called `os_packages` in
+the configuration folder. 
 
 For example, the following configuration line::
 
-  dpkg:
+  os_packages:
 
 .. -> checker_txt
 
@@ -353,11 +365,14 @@ Will result in the following files being present in the configuration
 folder:: 
 
   checker.txt
-  dpkg
+  os_packages
 
 .. -> expected
 
-With :file:`dpkg` containing something like::
+The contents of the file will depend on which command ends up being
+used. 
+
+If :command:`dpkg` is used, :file:`os_packages` will contain something like::
 
   Desired=Unknown/Install/Remove/Purge/Hold
   | Status=Not/Installed/Config-f/Unpacked/Failed-cfg/Half-inst/t-aWait/T-pend
@@ -369,12 +384,6 @@ With :file:`dpkg` containing something like::
   ii  apache2                   2.2.8-1ubuntu0.10         Next generation, scalable, extendable web server
   
 .. -> expected_content
-
-.. we expect the following command to be executed:
-
-  dpkg -l
-
-.. -> command
 
 .. invisible-code-block: python
 
@@ -388,14 +397,88 @@ With :file:`dpkg` containing something like::
     c.output.check()
     # check the calls
     compare(c.called,[
-        command.strip(),
+        'which dpkg',
+        'dpkg -l',
         'svn up -q <config>',
         'svn status <config>'
         ])
     # check the files are as expected
     compare(listall(c.dir),expected.split())
     # check the root file content
-    compare(c.dir.read(('dpkg')),expected_content)
+    compare(c.dir.read(('os_packages')),expected_content)
+
+If :command:`yum` is used, :file:`os_packages` will contain something like::
+
+  Loaded plugins: rhnplugin, security
+  Excluding Packages in global exclude list
+  Finished
+  Installed Packages
+  MAKEDEV.x86_64                3.23-1.2            installed                     
+  OpenIPMI.x86_64               2.0.16-5.el5_4.1    installed                     
+  OpenIPMI-libs.x86_64          2.0.16-5.el5_4.1    installed                     
+  SysVinit.x86_64               2.86-15.el5         installed                     
+
+.. -> expected_content
+
+.. invisible-code-block: python
+
+  from __future__ import with_statement
+  with CommandContext() as c:
+    # set up the commands
+    c.add('which dpkg',returncode=1)
+    c.add('yum list',expected_content)
+    #  run the config
+    c.run_with_config(checker_txt)
+    # check output
+    c.output.check()
+    # check the calls
+    compare(c.called,[
+        'which dpkg',
+        'which yum',
+        'yum list',
+        'svn up -q <config>',
+        'svn status <config>'
+        ])
+    # check the files are as expected
+    compare(listall(c.dir),expected.split())
+    # check the root file content
+    compare(c.dir.read(('os_packages')),expected_content)
+
+If :command:`up2date` is used, :file:`os_packages` will contain something like::
+
+  4Suite-1.0-3.el4_8.1.i386
+  Canna-3.7p3-9.el4.i386
+  Canna-devel-3.7p3-9.el4.i386
+  Canna-libs-3.7p3-9.el4.i386
+  ElectricFence-2.2.2-19.i386
+
+.. -> expected_content
+
+.. invisible-code-block: python
+
+  from __future__ import with_statement
+  with CommandContext() as c:
+    # set up the commands
+    c.add('which dpkg',returncode=1)
+    c.add('which yum',returncode=1)
+    c.add('up2date --showall',expected_content)
+    #  run the config
+    c.run_with_config(checker_txt)
+    # check output
+    c.output.check()
+    # check the calls
+    compare(c.called,[
+        'which dpkg',
+        'which yum',
+        'which up2date',
+        'up2date --showall',
+        'svn up -q <config>',
+        'svn status <config>'
+        ])
+    # check the files are as expected
+    compare(listall(c.dir),expected.split())
+    # check the root file content
+    compare(c.dir.read(('os_packages')),expected_content)
 
 init
 ----
