@@ -11,6 +11,8 @@ configuration data:
 
 - text files and directories containing text files
 
+- the output of arbitrary commands
+
 - Subversion checkouts
 
 - `buildouts`__
