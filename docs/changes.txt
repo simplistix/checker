@@ -1,6 +1,11 @@
 Changes
 =======
 
+1.4 (26 Sep 2010)
+-----------------
+
+- add the generic :command:`command` checker.
+
 1.3 (15 Jul 2010)
 -----------------
 

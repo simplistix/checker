@@ -164,6 +164,64 @@ This means that the implicit checker run on the configuration folder
 will show up any changes in the contents, ownership or permissions of
 any file or folder specified in a `path` checker.
 
+command
+-------
+
+This checker allows any command to be run and its output written to
+the file specified.
+
+For example, the following configuration line::
+
+  command:services:chkconfig --list
+
+.. -> checker_txt
+
+Will result in the following commands being executed::
+
+  chkconfig --list
+
+.. -> command
+
+It will also result in the following being present in the
+configuration folder::
+
+  checker.txt
+  services
+
+.. -> expected
+
+The :file:`services` file will contain the output of running the
+commands, which in this case is likely to look something like:
+
+  cpuspeed        0:off   1:on    2:on    3:on    4:on    5:on    6:off
+  sysstat         0:off   1:on    2:on    3:on    4:on    5:on    6:off
+  snmptrapd       0:off   1:off   2:off   3:off   4:off   5:off   6:off
+
+.. -> output
+
+.. invisible-code-block: python
+
+  from __future__ import with_statement
+  from checker.tests.base import CommandContext
+  from testfixtures import compare
+  with CommandContext() as c:
+    # set up the command
+    c.add('chkconfig --list',output)
+    #  run the config
+    c.run_with_config(checker_txt)
+    # check output
+    c.output.check()
+    # check the calls
+    compare(c.called,[
+        command.strip(),
+        'svn up -q <config>',
+        'svn status <config>'
+        ])
+    # check the files are as expected
+    compare(listall(c.dir,dir=False),expected.split())
+    # check the file content
+    compare(c.dir.read(('services',)),output)
+
 svn
 ---
 
