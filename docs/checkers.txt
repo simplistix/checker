@@ -191,7 +191,7 @@ configuration folder::
 .. -> expected
 
 The :file:`services` file will contain the output of running the
-commands, which in this case is likely to look something like:
+commands, which in this case is likely to look something like::
 
   cpuspeed        0:off   1:on    2:on    3:on    4:on    5:on    6:off
   sysstat         0:off   1:on    2:on    3:on    4:on    5:on    6:off
