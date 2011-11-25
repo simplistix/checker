@@ -26,7 +26,7 @@ setup(
     install_requires = [
         'argparse',
         'execute',
-        'mailinglogger',
+        'mailinglogger >= 3.4.0',
         'zope.dottedname',
         ],
     entry_points=dict(

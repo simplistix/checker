@@ -101,8 +101,8 @@ class OutputtingContext(DirHandlerContext):
         main(('-C '+self.dir.path).split())
 
     def check_email_config(self,from_,to_,subject,smtphost):
-        compare([C('mailinglogger.SummarisingLogger.SummarisingLogger',
-                   mailer=C('mailinglogger.MailingLogger.MailingLogger',
+        compare([C('mailinglogger.SummarisingLogger',
+                   mailer=C('mailinglogger.MailingLogger',
                             fromaddr=from_,
                             toaddrs=to_,
                             subject=subject,
