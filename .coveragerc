@@ -1,0 +1,9 @@
+[run]
+branch = True
+
+[report]
+exclude_lines = 
+  # the original exclude
+  pragma: no cover
+
+  # code executed only when tests fail
