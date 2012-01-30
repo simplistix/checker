@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2012 Simplistix Ltd
 #
 # See license.txt for more details.
 
@@ -7,7 +7,6 @@ import os
 from base import ContextTest,CommandContext,listall,cleanup
 from checker.checkers.path import check
 from testfixtures import compare
-from unittest import TestSuite,makeSuite
 
 class TestPath(ContextTest):
 
@@ -43,8 +42,3 @@ class TestPath(ContextTest):
                 "cp -R '/some/deep/path' '<config>/some/deep'",
                 "LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/deep/path'",
                 ])
-
-def test_suite():
-    return TestSuite((
-        makeSuite(TestPath),
-        ))

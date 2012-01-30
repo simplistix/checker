@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2012 Simplistix Ltd
 #
 # See license.txt for more details.
 from __future__ import with_statement
@@ -10,7 +10,7 @@ from base import ContextTest,cleanup
 from checker import main, check
 from mock import Mock
 from testfixtures import Replacer,should_raise,compare,LogCapture
-from unittest import TestSuite,TestCase,makeSuite
+from unittest import TestCase
 
 class TestMain(TestCase):
 
@@ -136,11 +136,3 @@ class TestEmail(ContextTest):
             'Checker output from %(hostname)s',
             'localhost',
             )
-    
-def test_suite():
-    return TestSuite((
-        makeSuite(TestMain),
-        makeSuite(TestMain2),
-        makeSuite(TestCheck),
-        makeSuite(TestEmail),
-        ))

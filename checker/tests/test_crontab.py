@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Simplistix Ltd
+# Copyright (c) 2009-2012 Simplistix Ltd
 #
 # See license.txt for more details.
 
@@ -7,7 +7,6 @@ import os
 from base import ContextTest,CommandContext
 from checker.checkers.crontab import check
 from testfixtures import compare
-from unittest import TestSuite,makeSuite
 
 class TestCrontab(ContextTest):
 
@@ -20,8 +19,3 @@ class TestCrontab(ContextTest):
         self.c.dir.check_dir('crontabs','root')
         compare(self.c.dir.read(('crontabs','root')),
                 'crontab output')
-
-def test_suite():
-    return TestSuite((
-        makeSuite(TestCrontab),
-        ))
