@@ -14,9 +14,6 @@ from unittest import TestCase
 
 class BaseContext:
 
-    def setUp(self):
-        pass
-    
     def __init__(self,*args,**kw):
         self.r = Replacer()
         self.cleanups = [self.r.restore]

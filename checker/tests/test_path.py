@@ -42,3 +42,22 @@ class TestPath(ContextTest):
                 "cp -R '/some/deep/path' '<config>/some/deep'",
                 "LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/deep/path'",
                 ])
+
+    def test_storage_path_already_exists(self):
+        # This is the key element of this test:
+        self.c.dir.makedir('something')
+        
+        self.c.r.replace('subprocess.mswindows',False)
+        # pretend only our path exists
+        path = '/something'
+        self.c.existing_paths.add(path)
+
+        compare(check(self.c.config_folder, path), '')
+        compare(listall(self.c.dir),[
+                'something.listing',
+                'something',
+                ])
+        compare(self.c.called,[
+                "cp -R '/something' '<config>'",
+                "LC_COLLATE=\"C\" ls -laR --time-style=+ '/something'",
+                ])
