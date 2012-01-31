@@ -30,7 +30,11 @@ __ http://pypi.python.org/pypi/zc.recipe.egg
 .. check the above actually works:
 
   >>> write(sample_buildout,'buildout.cfg',buildout_cfg)
-  >>> print system(buildout)
+  >>> output = system(buildout).split('\n')
+  >>> for word in ('Updgraded', 'setuptools', 'restarting'):
+  ...     if output[0].startswith(word):
+  ...         output = output[1:]
+  >>> print '\n'.join(output)
   Installing checker.
   Generated script '/sample-buildout/bin/checker'.
   <BLANKLINE>
