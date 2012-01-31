@@ -32,7 +32,7 @@ __ http://pypi.python.org/pypi/zc.recipe.egg
   >>> write(sample_buildout,'buildout.cfg',buildout_cfg)
   >>> output = system(buildout).split('\n')
   >>> for word in ('Upgraded', 'setuptools', 'restarting',
-  ...               'Installing', "buildout'."):
+  ...               "buildout'.", 'Installing'):
   ...     to_check = output[0].strip()
   ...     if (to_check.startswith(word) 
   ...         or to_check.endswith(word)
