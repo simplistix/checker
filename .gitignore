@@ -6,5 +6,6 @@
 /*.egg-info/
 /parts/
 *.pyc
+/*.xml
 /.coverage
 /htmlcov
