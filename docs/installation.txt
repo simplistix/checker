@@ -31,11 +31,12 @@ __ http://pypi.python.org/pypi/zc.recipe.egg
 
   >>> write(sample_buildout,'buildout.cfg',buildout_cfg)
   >>> output = system(buildout).split('\n')
-  >>> for word in ('Updgraded', 'setuptools', 'restarting',
-  ...               'Installing', 'buildout'):
-  ...     if (output[0].startswith(word) 
-  ...         or output[0].endswith(word)
-  ...         or not output[0].strip()):
+  >>> for word in ('Upgraded', 'setuptools', 'restarting',
+  ...               'Installing', "buildout'."):
+  ...     to_check = output[0].strip()
+  ...     if (to_check.startswith(word) 
+  ...         or to_check.endswith(word)
+  ...         or not to_check.strip()):
   ...         output = output[1:]
   >>> print '\n'.join(output)
   Generated script '/sample-buildout/bin/checker'.
