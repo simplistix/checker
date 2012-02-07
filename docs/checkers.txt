@@ -614,3 +614,22 @@ The `mysql` file is likely to contain something like the following::
     compare(listall(c.dir,dir=False),expected.split())
     # check the mysql file content
     compare(c.dir.read(('init','mysql')),expected_content)
+
+jenkins
+-------
+
+This checker will copy the xml files from a Jenkins or Hudson
+home directory into the configuration folder. The tree structure of
+the home directory will be maintained.
+
+For example, the following configuration line::
+
+  jenkins:/home/users/jenkins
+
+Will result in something like the following being present in the
+configuration folder::
+
+  checker.txt
+  home/users/jenkins/hudson.model.UpdateCenter.xml
+  home/users/jenkins/nodeMonitors.xml
+  home/users/jenkins/jobs/some_job/config.xml
