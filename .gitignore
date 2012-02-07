@@ -9,3 +9,4 @@
 /*.xml
 /.coverage
 /htmlcov
+/.tox
