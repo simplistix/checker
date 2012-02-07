@@ -49,3 +49,8 @@ A recommended way to install Checker is to have the :ref:`configuration
 folder <configuration-folder>` be a subversion checkout containing
 :file:`buildout.cfg`, :file:`bootstrap.py` and your
 :file:`checker.txt`.
+
+.. topic:: Python version requirements
+
+  This package has been tested with Python 2.5, 2.6 and 2.7 on Linux,
+  Mac OS X and Windows.
