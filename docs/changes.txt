@@ -1,6 +1,20 @@
 Changes
 =======
 
+1.5 (8 Feb 2012)
+-----------------
+
+- add the :command:`jenkins` checker.
+
+- Development model moved to continuous integration using Jenkins.
+
+- 100% line and branch coverage with tests.
+
+- Introduced `Tox`__ based testing to ensure packaging and
+  dependencies are as expected.
+
+  __ http://tox.testrun.org/latest/
+
 1.4 (26 Sep 2010)
 -----------------
 
