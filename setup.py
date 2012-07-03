@@ -1,7 +1,7 @@
 # Copyright (c) 2009-2012 Simplistix Ltd
 # See license.txt for license details.
 
-import os
+import os, sys
 from ConfigParser import RawConfigParser
 from setuptools import setup, find_packages
 
