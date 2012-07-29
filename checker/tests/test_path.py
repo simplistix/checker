@@ -61,3 +61,52 @@ class TestPath(ContextTest):
                 "cp -R '/something' '<config>'",
                 "LC_COLLATE=\"C\" ls -laR --time-style=+ '/something'",
                 ])
+
+    def test_selinux_entries(self):
+        # selinux in the 2.6 kernel introduces a new column
+        # in the permissions block, which we ignore for now
+        checker_txt = "path:/some/folder\n"
+        
+        with CommandContext() as c:
+            # pretend we're not on windows
+            c.r.replace('subprocess.mswindows',False)
+            # pretend the paths exist
+            c.existing_paths.add('/some/folder')
+            # stub out the cp and ls calls
+            c.add("cp -R '/some/folder' '<config>/some'",files=(
+                ('some/folder/afile.cfg','content'),
+                ('some/folder/bfile.cfg','content'),
+                ('some/folder/cfile.cfg','content'),
+                ))
+            c.add("LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/folder'",
+                  output="""/some/folder:
+total 36
+drwxr-xr-x.  2 root root 4096  .
+drwxr-xr-x+ 46 root root 4096  ..
+-rw-r--r--.  1 root root 2425  afile.cfg
+-rw-r--r--+  1 root root 1421  bfile.cfg
+-rw-r--r--   1 root root 1421  cfile.cfg
+""")
+            # now run the config
+            c.run_with_config(checker_txt)
+            # check the calls
+            compare(c.called,[
+                "cp -R '/some/folder' '<config>/some'",
+                "LC_COLLATE=\"C\" ls -laR --time-style=+ '/some/folder'",
+                'svn up -q <config>',
+                'svn status <config>'
+                ])
+            # check the files are as expected
+            compare([
+                'checker.txt',
+                'some/folder.listing',
+                'some/folder/afile.cfg',
+                'some/folder/bfile.cfg',
+                'some/folder/cfile.cfg',
+                ], listall(c.dir,dir=False))
+            compare("""/some/folder:
+drwxr-xr-x root root .
+-rw-r--r-- root root afile.cfg
+-rw-r--r-- root root bfile.cfg
+-rw-r--r-- root root cfile.cfg
+""", c.dir.read(('some', 'folder.listing')))

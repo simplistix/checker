@@ -10,7 +10,7 @@ import subprocess
 import execute
 
 unix_row_re = re.compile(
-    '^((?P<dirname>/.*:)|(?P<perms>[\w-][wrx-]{9}) '
+    '^((?P<dirname>/.*:)|(?P<perms>[\w-][wrx-]{9})[+\.]? '
     '+(?P<links>\d+) (?P<user>[\w_-]+) +(?P<group>[\w_-]+) '
     '+(?P<size>\d+) +(?P<path>.*))$',
     re.MULTILINE
@@ -60,9 +60,10 @@ def check(config_folder,path):
                     e.group('path')
         else:
             execute.simple('cp -R %r %r'%(path,target_dir))
-            for e in unix_row_re.finditer(
-                execute.simple('LC_COLLATE="C" ls -laR --time-style=+ %r'%path)
-                ):
+            output = execute.simple(
+                'LC_COLLATE="C" ls -laR --time-style=+ %r' % path
+                )
+            for e in unix_row_re.finditer(output):
                 if e.group('path')=='..':
                     continue
                 if e.group('dirname'):
