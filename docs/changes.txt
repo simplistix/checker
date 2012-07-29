@@ -4,7 +4,7 @@ Changes
 1.6 (29 July 2012)
 ------------------
 
-- with the :comman:`path` checker, ignore the extra column in the
+- with the :command:`path` checker, ignore the extra column in the
   permission block added by the SELinux integration in the 2.6
   kernel.
 
