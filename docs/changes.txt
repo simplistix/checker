@@ -1,7 +1,12 @@
 Changes
 =======
 
-1.6 (29 July 2012)
+1.7 (19 Jan 2013)
+------------------
+
+- implement :option:`--no-email` option.
+
+1.6 (29 Jul 2012)
 ------------------
 
 - with the :command:`path` checker, ignore the extra column in the
