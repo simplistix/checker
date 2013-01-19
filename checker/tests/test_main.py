@@ -9,7 +9,7 @@ from base import OpenRaisesContext,ConfigContext, OutputtingContext
 from base import ContextTest,cleanup
 from checker import main, check
 from mock import Mock
-from testfixtures import Replacer,should_raise,compare,LogCapture
+from testfixtures import LogCapture, Replacer, compare, should_raise
 from unittest import TestCase
 
 class TestMain(TestCase):
@@ -136,3 +136,14 @@ class TestEmail(ContextTest):
             'Checker output from %(hostname)s',
             'localhost',
             )
+
+    def test_disable_email(self):
+        stream_handler = Mock()
+        with Replacer() as r:
+            # no console output...
+            r.replace('checker.StreamHandler', stream_handler)
+            self.c.run_with_config('email_to:recipient@example.com',
+                                   ' --no-email')
+        # check no handlers are registered.
+        compare([stream_handler.return_value], self.c.handlers)
+        

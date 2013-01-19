@@ -160,3 +160,11 @@ are not present, the following defaults will be used:
 
 `email_smtphost`
   This defaults to `localhost`.
+
+It can be helpful to turn this behaviour off for manual runs where you
+know configurations have changes and you want to see output in your
+shell rather than by email. When that is the case, pass the
+:option:`--no-email` option::
+
+  checker --no-email
+

@@ -32,7 +32,8 @@ special = (
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-C',default='/config',dest='config_folder')
+    parser.add_argument('-C', default='/config', dest='config_folder')
+    parser.add_argument('--no-email', action='store_true')
     args = parser.parse_args(argv)
     args.config_checker = 'svn'
     args.config_folder = os.path.abspath(args.config_folder)
@@ -51,7 +52,7 @@ def main(argv=None):
         else:
             checkers.append(c)
     logger.setLevel(INFO)
-    if getattr(args,'email_to',None):
+    if getattr(args,'email_to',None) and not args.no_email:
         to_ = [e.strip() for e in args.email_to.split(',')]
         from_ = getattr(args,'email_from',to_[0]).strip()
         handler = SummarisingLogger(

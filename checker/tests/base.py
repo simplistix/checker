@@ -92,10 +92,10 @@ class OutputtingContext(DirHandlerContext):
             return the_checker
         self.r.replace('checker.resolve',resolve)
         
-    def run_with_config(self,config):
-        config+='\nreal:checker'
-        self.dir.write('checker.txt',config)
-        main(('-C '+self.dir.path).split())
+    def run_with_config(self, config, args=''):
+        config += '\nreal:checker'
+        self.dir.write('checker.txt', config)
+        main(('-C '+self.dir.path+args).split())
 
     def check_email_config(self,from_,to_,subject,smtphost):
         compare([C('mailinglogger.SummarisingLogger',
