@@ -54,7 +54,7 @@ def check(config_folder, jenkins_home):
             finally:
                 manifest.close()
         finally:
-            zip.close()
+            zip.close() # pragma: no branch
 
         # check what I think is true is actually true!
         for a, b in (('extension-name', 'implementation-title'),
