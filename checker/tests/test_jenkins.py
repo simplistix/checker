@@ -75,10 +75,11 @@ Plugin-Version: 1
 """)
         compare(check(self.c.dir.path, self.jenkins.path), '')
 
-        compare('''\
-test1: 2
-test2: 1
-''',
+        compare(os.linesep.join((
+            'test1: 2',
+            'test2: 1',
+            '',
+            )),
                 self.c.dir.read(
                     self.jenkins.path.split(os.sep)[1:]+['plugin-versions.txt']
                     ))
