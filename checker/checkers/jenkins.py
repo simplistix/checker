@@ -33,11 +33,11 @@ def check(config_folder, jenkins_home):
         
     # the plugin versions
     plugins = {}
-    for plugin_path in _paths(jenkins_home, ['plugins', '*.jpi']):
-        zip = ZipFile(plugin_path)
+    for manifest_path in _paths(jenkins_home,
+                              ['plugins', '*', 'META-INF', 'MANIFEST.MF']):
         data = {}
-        try:
-            for line in zip.read('META-INF/MANIFEST.MF').split('\n'):
+        with open(manifest_path) as manifest:
+            for line in manifest:
                 parts = line.split(':', 1)
                 if len(parts) < 2:
                     continue
@@ -50,8 +50,6 @@ def check(config_folder, jenkins_home):
                         'value was %r, now %r'
                         ) % (key, data[key], value))
                 data[key] = value
-        finally:
-            zip.close() # pragma: no branch
 
         # check what I think is true is actually true!
         for a, b in (('extension-name', 'implementation-title'),
@@ -62,7 +60,7 @@ def check(config_folder, jenkins_home):
                     ))
 
         name = data['extension-name']
-        filename = split(plugin_path)[1]
+        filename = manifest_path.split(sep)[-3]
         if name in plugins:
             raise AssertionError('%r and %r both said they were %r' % (
                 plugins[name][1], filename, name

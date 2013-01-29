@@ -8,7 +8,6 @@ import os
 from base import ContextTest, OutputtingContext
 from checker.checkers.jenkins import check
 from testfixtures import ShouldRaise, TempDirectory, compare
-from zipfile import ZipFile
 
 class Tests(ContextTest):
 
@@ -51,12 +50,7 @@ class Tests(ContextTest):
         compare(self.c.dir.read(path), 'new')
 
     def _write_jpi(self, name, manifest):
-        path = self.jenkins.write('plugins/'+name+'.jpi', '')
-        zip = ZipFile(path, 'w')
-        try:
-            zip.writestr('META-INF/MANIFEST.MF', manifest)
-        finally:
-            zip.close()
+        self.jenkins.write('plugins/'+name+'/META-INF/MANIFEST.MF', manifest)
 
     def test_plugin_versions(self):
         self._write_jpi('test1', """
@@ -137,6 +131,6 @@ Implementation-Version: 1
 Plugin-Version: 1
 """)
         with ShouldRaise(AssertionError(
-            "'test1.jpi' and 'test2.jpi' both said they were 'test1'"
+            "'test1' and 'test2' both said they were 'test1'"
             )):
             check(self.c.dir.path, self.jenkins.path)
