@@ -37,23 +37,19 @@ def check(config_folder, jenkins_home):
         zip = ZipFile(plugin_path)
         data = {}
         try:
-            manifest = zip.open('META-INF/MANIFEST.MF')
-            try:
-                for line in manifest:
-                    parts = line.split(':', 1)
-                    if len(parts) < 2:
-                        continue
-                    name, value = parts
-                    key = name.lower().strip()
-                    value = value.strip()
-                    if key in data:
-                        raise AssertionError((
-                            'duplicate keys for %r found, '
-                            'value was %r, now %r'
-                            ) % (key, data[key], value))
-                    data[key] = value
-            finally:
-                manifest.close()
+            for line in zip.read('META-INF/MANIFEST.MF').split('\n'):
+                parts = line.split(':', 1)
+                if len(parts) < 2:
+                    continue
+                name, value = parts
+                key = name.lower().strip()
+                value = value.strip()
+                if key in data:
+                    raise AssertionError((
+                        'duplicate keys for %r found, '
+                        'value was %r, now %r'
+                        ) % (key, data[key], value))
+                data[key] = value
         finally:
             zip.close() # pragma: no branch
 
