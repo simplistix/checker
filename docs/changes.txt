@@ -1,6 +1,12 @@
 Changes
 =======
 
+1.9 (30 Jan 2013)
+------------------
+
+- Changed :command:`jenkins` checker to more robustly record versions
+  of plugins installed.
+
 1.8 (29 Jan 2013)
 ------------------
 
