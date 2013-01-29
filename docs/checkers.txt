@@ -621,6 +621,9 @@ jenkins
 This checker will copy the xml files from a Jenkins or Hudson
 home directory into the configuration folder. The tree structure of
 the home directory will be maintained.
+A text file called :file:`plugin-versions.txt` will also be created
+that contains a list of all the plugin names installed along with
+their version.
 
 For example, the following configuration line::
 
@@ -631,5 +634,6 @@ configuration folder::
 
   checker.txt
   home/users/jenkins/hudson.model.UpdateCenter.xml
-  home/users/jenkins/nodeMonitors.xml
   home/users/jenkins/jobs/some_job/config.xml
+  home/users/jenkins/nodeMonitors.xml
+  home/users/jenkins/plugin-versions.txt

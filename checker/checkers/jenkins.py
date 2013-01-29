@@ -1,24 +1,83 @@
-# Copyright (c) 2012 Simplistix Ltd
+# Copyright (c) 2012-2013 Simplistix Ltd
 #
 # See license.txt for more details.
 
 from glob import glob
 from os import sep, makedirs
-from os.path import join, dirname, exists
+from os.path import join, dirname, exists, split
 from shutil import copyfile
+from zipfile import ZipFile
 
-def _paths(jenkins_home):
-    for pattern in ['*.xml'], ['jobs', '*', 'config.xml']:
-        for path in glob(join(jenkins_home, *pattern)):
+def _paths(jenkins_home, *patterns):
+    for pattern in patterns:
+        for path in sorted(glob(join(jenkins_home, *pattern))):
             yield path
-            
-def check(config_folder, jenkins_home):
-    for src_path in _paths(jenkins_home):
-        target_path = join(config_folder, *src_path.split(sep)[1:])
-        target_dir = dirname(target_path)
-        if not exists(target_dir):
-            makedirs(target_dir)
-        copyfile(src_path, target_path)
+
+def make_path(config_folder, src_path):
+    target_path = join(config_folder, *src_path.split(sep)[1:])
+    target_dir = dirname(target_path)
+    if not exists(target_dir):
+        makedirs(target_dir)
+    return target_path
     
+    
+def check(config_folder, jenkins_home):
+    
+    # The .xml files
+    for src_path in _paths(jenkins_home,
+                           ['*.xml'],
+                           ['jobs', '*', 'config.xml']):
+        target_path = make_path(config_folder, src_path)
+        copyfile(src_path, target_path)
+        
+    # the plugin versions
+    plugins = {}
+    for plugin_path in _paths(jenkins_home, ['plugins', '*.jpi']):
+        zip = ZipFile(plugin_path)
+        data = {}
+        try:
+            manifest = zip.open('META-INF/MANIFEST.MF')
+            try:
+                for line in manifest:
+                    parts = line.split(':', 1)
+                    if len(parts) < 2:
+                        continue
+                    name, value = parts
+                    key = name.lower().strip()
+                    value = value.strip()
+                    if key in data:
+                        raise AssertionError((
+                            'duplicate keys for %r found, '
+                            'value was %r, now %r'
+                            ) % (key, data[key], value))
+                    data[key] = value
+            finally:
+                manifest.close()
+        finally:
+            zip.close()
+
+        # check what I think is true is actually true!
+        for a, b in (('extension-name', 'implementation-title'),
+                     ('plugin-version', 'implementation-version')):
+            if data[a] != data[b]:
+                raise AssertionError('%s (%r) != %s (%r)' % (
+                    a, data[a], b, data[b]
+                    ))
+
+        name = data['extension-name']
+        filename = split(plugin_path)[1]
+        if name in plugins:
+            raise AssertionError('%r and %r both said they were %r' % (
+                plugins[name][1], filename, name
+                ))
+        plugins[name]= data['plugin-version'], filename
+    
+    with open(make_path(config_folder, join(
+        jenkins_home, 'plugin-versions.txt'
+        )), 'w') as output:
+        for name, info in sorted(plugins.items()):
+            version, _ = info
+            output.write('%s: %s\n' % (name, version))
+
     return ''
     
