@@ -37,7 +37,7 @@ def check(config_folder, jenkins_home):
                               ['plugins', '*', 'META-INF', 'MANIFEST.MF']):
         data = {}
         with open(manifest_path) as manifest:
-            for line in manifest:
+            for line in manifest: # pragma: no branch
                 parts = line.split(':', 1)
                 if len(parts) < 2:
                     continue
