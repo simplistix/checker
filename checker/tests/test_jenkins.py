@@ -92,19 +92,6 @@ Plugin-Version: 2
             )):
             check(self.c.dir.path, self.jenkins.path)
 
-    def test_plugin_versions_versus_implementation_version(self):
-        self._write_jpi('test1', """
-Junk: 1.0
-Extension-Name: test1
-Implementation-Title: test1
-Implementation-Version: 1
-Plugin-Version: 2
-""")
-        with ShouldRaise(AssertionError(
-            "plugin-version ('2') != implementation-version ('1')"
-            )):
-            check(self.c.dir.path, self.jenkins.path)
-
     def test_duplicate_key(self):
         self._write_jpi('test1', """
 Extension-Name: test1
@@ -134,3 +121,21 @@ Plugin-Version: 1
             "'test1' and 'test2' both said they were 'test1'"
             )):
             check(self.c.dir.path, self.jenkins.path)
+
+    def test_development_plugin(self):
+        self._write_jpi('test', """
+Extension-Name: dropdown-viewstabbar-plugin
+Implementation-Title: dropdown-viewstabbar-plugin
+Implementation-Version: 1.6-SNAPSHOT
+Plugin-Version: 1.6-SNAPSHOT (private-06/29/2012 15:10-hudson)
+""")
+        compare(check(self.c.dir.path, self.jenkins.path), '')
+
+        compare(os.linesep.join((
+            'dropdown-viewstabbar-plugin: 1.6-SNAPSHOT (private-06/29/2012 15:10-hudson)',
+            '',
+            )),
+                self.c.dir.read(
+                    self.jenkins.path.split(os.sep)[1:]+['plugin-versions.txt']
+                    ))
+        

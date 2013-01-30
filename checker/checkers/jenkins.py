@@ -52,8 +52,7 @@ def check(config_folder, jenkins_home):
                 data[key] = value
 
         # check what I think is true is actually true!
-        for a, b in (('extension-name', 'implementation-title'),
-                     ('plugin-version', 'implementation-version')):
+        for a, b in (('extension-name', 'implementation-title'),):
             if data[a] != data[b]:
                 raise AssertionError('%s (%r) != %s (%r)' % (
                     a, data[a], b, data[b]
