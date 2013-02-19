@@ -53,7 +53,7 @@ def main(argv=None):
             checkers.append(c)
     logger.setLevel(INFO)
     if getattr(args,'email_to',None) and not args.no_email:
-        to_ = [e.strip() for e in args.email_to.split(',')]
+        to_ = [e.strip() for e in args.email_to.split(',')] # pragma: no branch
         from_ = getattr(args,'email_from',to_[0]).strip()
         handler = SummarisingLogger(
             from_,to_,
