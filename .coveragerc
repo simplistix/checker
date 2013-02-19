@@ -1,5 +1,6 @@
 [run]
 branch = True
+parallel = True
 
 [report]
 exclude_lines = 
@@ -7,3 +8,10 @@ exclude_lines =
   pragma: no cover
 
   # code executed only when tests fail
+
+[paths]
+src = 
+  ./checker/
+  C:\Jenkins\workspace\checker-buildout\*\checker
+  /var/lib/jenkins/slave/workspace/checker-buildout/*/checker
+  /Users/Shared/Jenkins/Home/workspace/checker-buildout/*/checker
