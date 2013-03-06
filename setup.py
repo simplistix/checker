@@ -21,6 +21,7 @@ if sys.version_info[:2] < (2, 6):
     test_requires.append('zope.exceptions<4.0dev')
     test_requires.append('zope.interface>=3.6.0,<4.0dev')
     test_requires.append('manuel<1.6')
+    test_requires.append('testfixtures<3.0.0')
 
 setup(
     name=package_name,
