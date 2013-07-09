@@ -39,6 +39,7 @@ __ http://pypi.python.org/pypi/zc.recipe.egg
   ...         or not to_check.strip()):
   ...         output = output[1:]
   >>> print '\n'.join(output)
+  Installing checker.
   Generated script '/sample-buildout/bin/checker'.
   <BLANKLINE>
 

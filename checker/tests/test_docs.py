@@ -21,6 +21,7 @@ checker = RENormalizing([
         normalize_endings,
         normalize_script,
         normalize_path,
+        (re.compile("Not found: .+\n"), ''),
         (re.compile(
                 "Couldn't find index page for '[a-zA-Z0-9.]+' "
                 "\(maybe misspelled\?\)"
