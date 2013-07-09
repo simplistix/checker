@@ -1,6 +1,14 @@
 Changes
 =======
 
+Unreleased
+----------
+
+- Move to Buildout 2.2 to buildout failures on windows.
+
+- Drop Python 2.5 support as Buildout 2 doesn't support it and all
+  major linux distros now ship with Python 2.6+.
+
 1.9 (30 Jan 2013)
 ------------------
 
