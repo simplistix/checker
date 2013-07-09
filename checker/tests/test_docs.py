@@ -21,7 +21,14 @@ checker = RENormalizing([
         normalize_endings,
         normalize_script,
         normalize_path,
+        
+        # a new one with buildout 2.0
         (re.compile("Not found: .+\n"), ''),
+        
+        # only appear on Python 2.6?!
+        (re.compile("Installing checker.\n"), ''),
+
+        # the usual one that needs ignoring
         (re.compile(
                 "Couldn't find index page for '[a-zA-Z0-9.]+' "
                 "\(maybe misspelled\?\)"
