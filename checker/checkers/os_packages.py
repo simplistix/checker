@@ -2,9 +2,7 @@
 #
 # See license.txt for more details.
 import os
-
 import execute
-from os.path import join
 
 def check(config_folder,junk):
     with open(os.path.join(config_folder, 'os_packages'), 'wb') as out:

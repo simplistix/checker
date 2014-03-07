@@ -3,7 +3,7 @@
 # See license.txt for more details.
 import os
 
-from base import ContextTest,CommandContext,listall,cleanup
+from base import ContextTest, CommandContext, listall
 from checker.checkers.path import check
 from testfixtures import compare
 

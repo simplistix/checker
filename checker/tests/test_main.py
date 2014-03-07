@@ -2,7 +2,7 @@
 #
 # See license.txt for more details.
 
-import os,sys
+import os
 
 from base import OpenRaisesContext,ConfigContext, OutputtingContext
 from base import ContextTest,cleanup

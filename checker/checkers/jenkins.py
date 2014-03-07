@@ -4,9 +4,8 @@
 
 from glob import glob
 from os import sep, makedirs
-from os.path import join, dirname, exists, split
+from os.path import join, dirname, exists
 from shutil import copyfile
-from zipfile import ZipFile
 
 def _paths(jenkins_home, *patterns):
     for pattern in patterns:
