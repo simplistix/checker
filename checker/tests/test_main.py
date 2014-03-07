@@ -8,7 +8,7 @@ from base import OpenRaisesContext,ConfigContext, OutputtingContext
 from base import ContextTest,cleanup
 from checker.check import main, check
 from mock import Mock
-from testfixtures import LogCapture, Replacer, compare, should_raise
+from testfixtures import LogCapture, Replacer, ShouldRaise, compare
 from unittest import TestCase
 
 class TestMain(TestCase):
@@ -16,13 +16,15 @@ class TestMain(TestCase):
     def test_no_args(self):
         with OpenRaisesContext(['ascript']):
             # make sure we look for the config in /config by default
-            should_raise(main,IOError("'/config/checker.txt' 'rU'"))()
+            with ShouldRaise(IOError("'/config/checker.txt' 'rU'")):
+                main()
 
     def test_abspath_config_folder(self):
-        with OpenRaisesContext('ascript -C config'.split()) as c:
+        with OpenRaisesContext('ascript -C config'.split()):
             # make any config specified is abspath'ed
             path = cleanup(os.path.abspath('config/checker.txt'))
-            should_raise(main,IOError("%r 'rU'" % path))()
+            with ShouldRaise(IOError("%r 'rU'" % path)):
+                main()
 
 class TestMain2(ContextTest):
 
@@ -58,10 +60,8 @@ class TestMain2(ContextTest):
                 )
 
     def test_no_colon_in_line(self):
-        should_raise(
-            self.c.run_with_config,
-            ValueError('No colon found on a line in checker.txt')
-            )("foo")
+        with ShouldRaise(ValueError('No colon found on a line in checker.txt')):
+            self.c.run_with_config("foo")
 
 class TestCheck(TestCase):
 
@@ -82,8 +82,8 @@ class TestCheck(TestCase):
         return resolve
         
     def test_bad_checker(self):
-        check = should_raise(check,ImportError('No module named unknown'))
-        check('/config','unknown',None)
+        with ShouldRaise(ImportError('No module named unknown')):
+            check('/config', 'unknown', None)
 
     def test_normal(self):
         m = self.checker_returns('some output')
