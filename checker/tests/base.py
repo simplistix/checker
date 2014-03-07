@@ -2,7 +2,7 @@
 #
 # See license.txt for more details.
 
-import atexit,os,re,sys
+import atexit, os, re
 
 from checker.check import main
 from mock import Mock
@@ -67,6 +67,7 @@ class DirHandlerContext(BaseContext):
 
     def removeAtExit(self):
         # make sure we haven't registered any atexit funcs
+        # (which will be done by MailingLogger!)
         atexit._exithandlers[:] = []
         
 class ConfigContext(DirHandlerContext):
