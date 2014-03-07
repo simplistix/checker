@@ -1,7 +1,6 @@
 # Copyright (c) 2009-2010 Simplistix Ltd
 #
 # See license.txt for more details.
-from __future__ import with_statement
 
 import atexit,os,re,sys
 

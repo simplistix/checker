@@ -19,7 +19,6 @@ command line options to the checker script::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with OpenRaisesContext(command.split()) as c:
       should_raise(main,IOError("'/some/folder/checker.txt' 'rU'"))()
 
@@ -41,7 +40,6 @@ configurations to be checked, for example::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with ConfigContext() as c:
       c.run_with_config(checker_txt)
       # order matters here!
@@ -70,7 +68,6 @@ follows::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with ConfigContext() as c:
       c.run_with_config(checker_txt)
       c.check_checkers_called(
@@ -87,7 +84,6 @@ should be used followed by the `buildout` checker::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with ConfigContext() as c:
       c.run_with_config(checker_txt)
       c.check_checkers_called(
@@ -135,7 +131,6 @@ added to :file:`checker.txt` as follows::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with OutputtingContext() as c:
       c.run_with_config(checker_txt)
       c.check_email_config(

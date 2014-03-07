@@ -53,7 +53,6 @@ unix systems::
   
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   from checker.tests.base import CommandContext,listall
   from testfixtures import compare
   with CommandContext() as c:
@@ -121,7 +120,6 @@ On Windows, they will look more like::
   
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   from checker.tests.base import CommandContext,listall
   from testfixtures import compare
   with CommandContext() as c:
@@ -201,7 +199,6 @@ commands, which in this case is likely to look something like::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   from checker.tests.base import CommandContext
   from testfixtures import compare
   with CommandContext() as c:
@@ -261,7 +258,6 @@ Will result in the following commands being executed::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   from checker.tests.base import CommandContext
   from testfixtures import compare
   with CommandContext() as c:
@@ -311,7 +307,6 @@ Will result in the following commands being executed::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
     c.add('svn status /some/folder','svn output')
@@ -371,7 +366,6 @@ The `root` file is likely to contain something like the following::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
     c.add('crontab -l -u root',expected_root)
@@ -445,7 +439,6 @@ If :command:`dpkg` is used, :file:`os_packages` will contain something like::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
     c.add('dpkg -l',expected_content)
@@ -480,7 +473,6 @@ If :command:`yum` is used, :file:`os_packages` will contain something like::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
     c.add('which dpkg',returncode=1)
@@ -514,7 +506,6 @@ If :command:`up2date` is used, :file:`os_packages` will contain something like::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
     c.add('which dpkg',returncode=1)
@@ -595,7 +586,6 @@ The `mysql` file is likely to contain something like the following::
 
 .. invisible-code-block: python
 
-  from __future__ import with_statement
   with CommandContext() as c:
     # set up the commands
     command = command.strip()

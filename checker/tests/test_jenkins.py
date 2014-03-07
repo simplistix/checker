@@ -1,4 +1,3 @@
-from __future__ import with_statement
 # Copyright (c) 2012-2013 Simplistix Ltd
 #
 # See license.txt for more details.

@@ -1,12 +1,9 @@
 # Copyright (c) 2009-2012 Simplistix Ltd
 #
 # See license.txt for more details.
-from __future__ import with_statement
-
 import os
 import re
 import subprocess
-
 import execute
 
 unix_row_re = re.compile(
