@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2010 Simplistix Ltd
+# Copyright (c) 2009-2014 Simplistix Ltd
 #
 # See license.txt for more details.
 

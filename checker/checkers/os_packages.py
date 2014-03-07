@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2012 Simplistix Ltd
+# Copyright (c) 2010-2014 Simplistix Ltd
 #
 # See license.txt for more details.
 import os
