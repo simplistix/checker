@@ -4,7 +4,7 @@
 
 import atexit,os,re,sys
 
-from checker import main
+from checker.check import main
 from mock import Mock
 from os.path import exists
 from testfixtures import compare,Comparison as C,TempDirectory
@@ -49,7 +49,7 @@ class OpenRaisesContext(BaseContext):
         def dummy_open(path,mode):
             raise IOError('%r %r'%(cleanup(path),mode))
         self.r.replace('sys.argv',argv)
-        self.r.replace('checker.open',dummy_open,strict=False)
+        self.r.replace('checker.check.open',dummy_open,strict=False)
 
 class DirHandlerContext(BaseContext):
     
@@ -59,7 +59,7 @@ class DirHandlerContext(BaseContext):
         # This one is so that we can check what log handlers
         # get added.
         self.handlers = []
-        self.r.replace('checker.logger.handlers',self.handlers)
+        self.r.replace('checker.check.logger.handlers', self.handlers)
 
     def run_with_config(self,config):
         self.dir.write('checker.txt',config)
@@ -76,7 +76,7 @@ class ConfigContext(DirHandlerContext):
         self.checked = Mock()
         def check(config_folder,checker,param):
             getattr(self.checked,checker)(config_folder,param)
-        self.r.replace('checker.check',check)
+        self.r.replace('checker.check.check', check)
 
     def check_checkers_called(self,*expected):
         compare(self.checked.method_calls,list(expected))
@@ -89,7 +89,7 @@ class OutputtingContext(DirHandlerContext):
             def the_checker(config,param):
                 return dotted
             return the_checker
-        self.r.replace('checker.resolve',resolve)
+        self.r.replace('checker.check.resolve', resolve)
         
     def run_with_config(self, config, args=''):
         config += '\nreal:checker'
@@ -134,7 +134,7 @@ class CommandContext(DirHandlerContext):
         with LogCapture() as output:
             with Replacer() as r:
                 # This one is so that there is no output...
-                r.replace('checker.StreamHandler',Mock())
+                r.replace('checker.check.StreamHandler', Mock())
                 DirHandlerContext.run_with_config(self,config)
         # ...other than what we capture with the LogCapture
         self.output = output

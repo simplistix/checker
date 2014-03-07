@@ -41,7 +41,7 @@ setup(
         ],
     entry_points=dict(
         console_scripts = [
-            'checker = checker:main',
+            'check = checker.check:main',
             ]
         ),    
     extras_require=dict(

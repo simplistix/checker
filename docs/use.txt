@@ -6,7 +6,7 @@ Using Checker
   from testfixtures import should_raise,compare
   from checker.tests.base import OpenRaisesContext,ConfigContext
   from checker.tests.base import OutputtingContext
-  from checker import main
+  from checker.check import main
 
 Once installed, checker is used by executing the checker script.
 This will look for a configuration, by default located in

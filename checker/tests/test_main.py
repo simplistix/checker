@@ -6,7 +6,7 @@ import os
 
 from base import OpenRaisesContext,ConfigContext, OutputtingContext
 from base import ContextTest,cleanup
-from checker import main, check
+from checker.check import main, check
 from mock import Mock
 from testfixtures import LogCapture, Replacer, compare, should_raise
 from unittest import TestCase
@@ -75,14 +75,13 @@ class TestCheck(TestCase):
 
     def checker_returns(self,output):
         resolve = Mock()
-        self.r.replace('checker.resolve',resolve)
+        self.r.replace('checker.check.resolve',resolve)
         def the_checker(config_folder,param):
             return output
         resolve.return_value = the_checker
         return resolve
         
     def test_bad_checker(self):
-        from checker import check
         check = should_raise(check,ImportError('No module named unknown'))
         check('/config','unknown',None)
 
@@ -140,7 +139,7 @@ class TestEmail(ContextTest):
         stream_handler = Mock()
         with Replacer() as r:
             # no console output...
-            r.replace('checker.StreamHandler', stream_handler)
+            r.replace('checker.check.StreamHandler', stream_handler)
             self.c.run_with_config('email_to:recipient@example.com',
                                    ' --no-email')
         # check no handlers are registered.
