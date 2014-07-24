@@ -3,7 +3,7 @@ Using Checker
 
 .. invisible-code-block: python
 
-  from testfixtures import should_raise,compare
+  from testfixtures import ShouldRaise, compare
   from checker.tests.base import OpenRaisesContext,ConfigContext
   from checker.tests.base import OutputtingContext
   from checker.check import main
@@ -20,7 +20,8 @@ command line options to the checker script::
 .. invisible-code-block: python
 
   with OpenRaisesContext(command.split()) as c:
-      should_raise(main,IOError("'/some/folder/checker.txt' 'rU'"))()
+      with ShouldRaise(IOError("'/some/folder/checker.txt' 'rU'")):
+          main()
 
 .. _configuration-folder:
 
